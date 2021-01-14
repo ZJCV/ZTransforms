@@ -7,6 +7,6 @@
 @description: 
 """
 
-import torchvision.transforms as transforms
+from .cls_transforms import *
 
-from .ztransforms import *
+__version__ = '0.1.0'

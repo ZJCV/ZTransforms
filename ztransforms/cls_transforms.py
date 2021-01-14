@@ -2,49 +2,43 @@
 
 """
 @date: 2021/1/12 下午2:25
-@file: ztransforms.py
+@file: cls_transforms.py
 @author: zj
-@description: 
+@description: 作用于分类任务的图像增强操作
 """
 
 import torch
 import math
 import random
-from PIL import Image
-try:
-    import accimage
-except ImportError:
-    accimage = None
+import cv2
+
 import numpy as np
 import numbers
 import types
 from collections.abc import Sequence, Iterable
 import warnings
 
-from . import functional as F
+from . import cls_functional as F
 
-
-__all__ = ["Compose", "ToTensor", "ToPILImage", "Normalize", "Resize", "Scale", "CenterCrop", "Pad",
+__all__ = ["Compose", "ToTensor", "Normalize", "Resize", "Scale", "CenterCrop", "Pad",
            "Lambda", "RandomApply", "RandomChoice", "RandomOrder", "RandomCrop", "RandomHorizontalFlip",
            "RandomVerticalFlip", "RandomResizedCrop", "RandomSizedCrop", "FiveCrop", "TenCrop", "LinearTransformation",
            "ColorJitter", "RandomRotation", "RandomAffine", "Grayscale", "RandomGrayscale",
            "RandomPerspective", "RandomErasing"]
 
-_pil_interpolation_to_str = {
-    Image.NEAREST: 'PIL.Image.NEAREST',
-    Image.BILINEAR: 'PIL.Image.BILINEAR',
-    Image.BICUBIC: 'PIL.Image.BICUBIC',
-    Image.LANCZOS: 'PIL.Image.LANCZOS',
-    Image.HAMMING: 'PIL.Image.HAMMING',
-    Image.BOX: 'PIL.Image.BOX',
+_opencv_interpolation_to_str = {
+    cv2.INTER_NEAREST: 'cv2.INTER_NEAREST',
+    cv2.INTER_LINEAR: 'cv2.INTER_LINEAR',
+    cv2.INTER_AREA: 'cv2.INTER_AREA',
+    cv2.INTER_CUBIC: 'cv2.INTER_CUBIC'
 }
 
 
 def _get_image_size(img):
-    if F._is_pil_image(img):
-        return img.size
+    if F._is_numpy(img):
+        return img.shape[:2]
     elif isinstance(img, torch.Tensor) and img.dim() > 2:
-        return img.shape[-2:][::-1]
+        return img.shape[-2:]
     else:
         raise TypeError("Unexpected type {}".format(type(img)))
 
@@ -80,12 +74,11 @@ class Compose(object):
 
 
 class ToTensor(object):
-    """Convert a ``PIL Image`` or ``numpy.ndarray`` to tensor.
+    """Convert a ``numpy.ndarray`` to tensor.
 
-    Converts a PIL Image or numpy.ndarray (H x W x C) in the range
+    Converts numpy.ndarray (H x W x C) in the range
     [0, 255] to a torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0]
-    if the PIL Image belongs to one of the modes (L, LA, P, I, F, RGB, YCbCr, RGBA, CMYK, 1)
-    or if the numpy.ndarray has dtype = np.uint8
+    if the numpy.ndarray has dtype = np.uint8
 
     In the other cases, tensors are returned without scaling.
     """
@@ -93,7 +86,7 @@ class ToTensor(object):
     def __call__(self, pic):
         """
         Args:
-            pic (PIL Image or numpy.ndarray): Image to be converted to tensor.
+            pic (numpy.ndarray): Image to be converted to tensor.
 
         Returns:
             Tensor: Converted image.
@@ -102,45 +95,6 @@ class ToTensor(object):
 
     def __repr__(self):
         return self.__class__.__name__ + '()'
-
-
-class ToPILImage(object):
-    """Convert a tensor or an ndarray to PIL Image.
-
-    Converts a torch.*Tensor of shape C x H x W or a numpy ndarray of shape
-    H x W x C to a PIL Image while preserving the value range.
-
-    Args:
-        mode (`PIL.Image mode`_): color space and pixel depth of input data (optional).
-            If ``mode`` is ``None`` (default) there are some assumptions made about the input data:
-             - If the input has 4 channels, the ``mode`` is assumed to be ``RGBA``.
-             - If the input has 3 channels, the ``mode`` is assumed to be ``RGB``.
-             - If the input has 2 channels, the ``mode`` is assumed to be ``LA``.
-             - If the input has 1 channel, the ``mode`` is determined by the data type (i.e ``int``, ``float``,
-               ``short``).
-
-    .. _PIL.Image mode: https://pillow.readthedocs.io/en/latest/handbook/concepts.html#concept-modes
-    """
-    def __init__(self, mode=None):
-        self.mode = mode
-
-    def __call__(self, pic):
-        """
-        Args:
-            pic (Tensor or numpy.ndarray): Image to be converted to PIL Image.
-
-        Returns:
-            PIL Image: Image converted to PIL Image.
-
-        """
-        return F.to_pil_image(pic, self.mode)
-
-    def __repr__(self):
-        format_string = self.__class__.__name__ + '('
-        if self.mode is not None:
-            format_string += 'mode={0}'.format(self.mode)
-        format_string += ')'
-        return format_string
 
 
 class Normalize(object):
@@ -179,7 +133,7 @@ class Normalize(object):
 
 
 class Resize(object):
-    """Resize the input PIL Image to the given size.
+    """Resize the input Numpy Image to the given size.
 
     Args:
         size (sequence or int): Desired output size. If size is a sequence like
@@ -187,27 +141,29 @@ class Resize(object):
             smaller edge of the image will be matched to this number.
             i.e, if height > width, then image will be rescaled to
             (size * height / width, size)
-        interpolation (int, optional): Desired interpolation. Default is
-            ``PIL.Image.BILINEAR``
+        interpolation (int, optional): If ``None``, the interpolation will be chosen automatically. For size
+        increases, ``area`` interpolation will be picked and for size
+        decreases, ``linear`` interpolation will be picked.
     """
 
-    def __init__(self, size, interpolation=Image.BILINEAR):
+    def __init__(self, size, interpolation=None):
         assert isinstance(size, int) or (isinstance(size, Iterable) and len(size) == 2)
-        self.size = size
+        self.size = (size, size) if isinstance(size, int) else size
         self.interpolation = interpolation
 
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be scaled.
+            img (Numpy Image): Image to be scaled.
 
         Returns:
-            PIL Image: Rescaled image.
+            Numpy Image: Rescaled image.
         """
         return F.resize(img, self.size, self.interpolation)
 
     def __repr__(self):
-        interpolate_str = _pil_interpolation_to_str[self.interpolation]
+        interpolate_str = 'None' if self.interpolation is None \
+            else interpolate_str = _opencv_interpolation_to_str[self.interpolation]
         return self.__class__.__name__ + '(size={0}, interpolation={1})'.format(self.size, interpolate_str)
 
 
@@ -215,6 +171,7 @@ class Scale(Resize):
     """
     Note: This transform is deprecated in favor of Resize.
     """
+
     def __init__(self, *args, **kwargs):
         warnings.warn("The use of the transforms.Scale transform is deprecated, " +
                       "please use transforms.Resize instead.")
@@ -222,7 +179,7 @@ class Scale(Resize):
 
 
 class CenterCrop(object):
-    """Crops the given PIL Image at the center.
+    """Crops the given Numpy Image at the center.
 
     Args:
         size (sequence or int): Desired output size of the crop. If size is an
@@ -239,10 +196,10 @@ class CenterCrop(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be cropped.
+            img (Numpy Image): Image to be cropped.
 
         Returns:
-            PIL Image: Cropped image.
+            Numpy Image: Cropped image.
         """
         return F.center_crop(img, self.size)
 
@@ -251,7 +208,7 @@ class CenterCrop(object):
 
 
 class Pad(object):
-    """Pad the given PIL Image on all sides with the given "pad" value.
+    """Pad the given Numpy Image on all sides with the given "pad" value.
 
     Args:
         padding (int or tuple): Padding on each border. If a single int is provided this
@@ -295,15 +252,15 @@ class Pad(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be padded.
+            img (Numpy Image): Image to be padded.
 
         Returns:
-            PIL Image: Padded image.
+            Numpy Image: Padded image.
         """
         return F.pad(img, self.padding, self.fill, self.padding_mode)
 
     def __repr__(self):
-        return self.__class__.__name__ + '(padding={0}, fill={1}, padding_mode={2})'.\
+        return self.__class__.__name__ + '(padding={0}, fill={1}, padding_mode={2})'. \
             format(self.padding, self.fill, self.padding_mode)
 
 
@@ -380,6 +337,7 @@ class RandomApply(RandomTransforms):
 class RandomOrder(RandomTransforms):
     """Apply a list of transformations in a random order
     """
+
     def __call__(self, img):
         order = list(range(len(self.transforms)))
         random.shuffle(order)
@@ -391,13 +349,14 @@ class RandomOrder(RandomTransforms):
 class RandomChoice(RandomTransforms):
     """Apply single transformation randomly picked from a list
     """
+
     def __call__(self, img):
         t = random.choice(self.transforms)
         return t(img)
 
 
 class RandomCrop(object):
-    """Crop the given PIL Image at a random location.
+    """Crop the given Numpy Image at a random location.
 
     Args:
         size (sequence or int): Desired output size of the crop. If size is an
@@ -447,13 +406,13 @@ class RandomCrop(object):
         """Get parameters for ``crop`` for a random crop.
 
         Args:
-            img (PIL Image): Image to be cropped.
+            img (Numpy Image): Image to be cropped.
             output_size (tuple): Expected output size of the crop.
 
         Returns:
             tuple: params (i, j, h, w) to be passed to ``crop`` for random crop.
         """
-        w, h = _get_image_size(img)
+        h, w = _get_image_size(img)
         th, tw = output_size
         if w == tw and h == th:
             return 0, 0, h, w
@@ -465,10 +424,10 @@ class RandomCrop(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be cropped.
+            img (Numpy Image): Image to be cropped.
 
         Returns:
-            PIL Image: Cropped image.
+            Numpy Image: Cropped image.
         """
         if self.padding is not None:
             img = F.pad(img, self.padding, self.fill, self.padding_mode)
@@ -489,7 +448,7 @@ class RandomCrop(object):
 
 
 class RandomHorizontalFlip(object):
-    """Horizontally flip the given PIL Image randomly with a given probability.
+    """Horizontally flip the given Numpy Image randomly with a given probability.
 
     Args:
         p (float): probability of the image being flipped. Default value is 0.5
@@ -515,7 +474,7 @@ class RandomHorizontalFlip(object):
 
 
 class RandomVerticalFlip(object):
-    """Vertically flip the given PIL Image randomly with a given probability.
+    """Vertically flip the given Numpy Image randomly with a given probability.
 
     Args:
         p (float): probability of the image being flipped. Default value is 0.5
@@ -527,10 +486,10 @@ class RandomVerticalFlip(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be flipped.
+            img (Numpy Image): Image to be flipped.
 
         Returns:
-            PIL Image: Randomly flipped image.
+            Numpy Image: Randomly flipped image.
         """
         if random.random() < self.p:
             return F.vflip(img)
@@ -541,7 +500,7 @@ class RandomVerticalFlip(object):
 
 
 class RandomPerspective(object):
-    """Performs Perspective transformation of the given PIL Image randomly with a given probability.
+    """Performs Perspective transformation of the given Numpy Image randomly with a given probability.
 
     Args:
         interpolation : Default- Image.BICUBIC
@@ -554,7 +513,7 @@ class RandomPerspective(object):
             If int, it is used for all channels respectively. Default value is 0.
     """
 
-    def __init__(self, distortion_scale=0.5, p=0.5, interpolation=Image.BICUBIC, fill=0):
+    def __init__(self, distortion_scale=0.5, p=0.5, interpolation=cv2.INTER_LINEAR, fill=0):
         self.p = p
         self.interpolation = interpolation
         self.distortion_scale = distortion_scale
@@ -563,16 +522,16 @@ class RandomPerspective(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be Perspectively transformed.
+            img (Numpy Image): Image to be Perspectively transformed.
 
         Returns:
-            PIL Image: Random perspectivley transformed image.
+            Numpy Image: Random perspectivley transformed image.
         """
-        if not F._is_pil_image(img):
-            raise TypeError('img should be PIL Image. Got {}'.format(type(img)))
+        if not F._is_numpy(img):
+            raise TypeError('img should be Numpy Image. Got {}'.format(type(img)))
 
         if random.random() < self.p:
-            width, height = img.size
+            height, width = img.shape[:2]
             startpoints, endpoints = self.get_params(width, height, self.distortion_scale)
             return F.perspective(img, startpoints, endpoints, self.interpolation, self.fill)
         return img
@@ -608,7 +567,7 @@ class RandomPerspective(object):
 
 
 class RandomResizedCrop(object):
-    """Crop the given PIL Image to random size and aspect ratio.
+    """Crop the given Numpy Image to random size and aspect ratio.
 
     A crop of random size (default: of 0.08 to 1.0) of the original size and a random
     aspect ratio (default: of 3/4 to 4/3) of the original aspect ratio is made. This crop
@@ -622,7 +581,7 @@ class RandomResizedCrop(object):
         interpolation: Default: PIL.Image.BILINEAR
     """
 
-    def __init__(self, size, scale=(0.08, 1.0), ratio=(3. / 4., 4. / 3.), interpolation=Image.BILINEAR):
+    def __init__(self, size, scale=(0.08, 1.0), ratio=(3. / 4., 4. / 3.), interpolation=cv2.INTER_LINEAR):
         if isinstance(size, (tuple, list)):
             self.size = size
         else:
@@ -639,7 +598,7 @@ class RandomResizedCrop(object):
         """Get parameters for ``crop`` for a random sized crop.
 
         Args:
-            img (PIL Image): Image to be cropped.
+            img (Numpy Image): Image to be cropped.
             scale (tuple): range of size of the origin size cropped
             ratio (tuple): range of aspect ratio of the origin aspect ratio cropped
 
@@ -647,7 +606,7 @@ class RandomResizedCrop(object):
             tuple: params (i, j, h, w) to be passed to ``crop`` for a random
                 sized crop.
         """
-        width, height = _get_image_size(img)
+        height, width = _get_image_size(img)
         area = height * width
 
         for _ in range(10):
@@ -681,16 +640,16 @@ class RandomResizedCrop(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be cropped and resized.
+            img (Numpy Image): Image to be cropped and resized.
 
         Returns:
-            PIL Image: Randomly cropped and resized image.
+            Numpy Image: Randomly cropped and resized image.
         """
         i, j, h, w = self.get_params(img, self.scale, self.ratio)
         return F.resized_crop(img, i, j, h, w, self.size, self.interpolation)
 
     def __repr__(self):
-        interpolate_str = _pil_interpolation_to_str[self.interpolation]
+        interpolate_str = _opencv_interpolation_to_str[self.interpolation]
         format_string = self.__class__.__name__ + '(size={0}'.format(self.size)
         format_string += ', scale={0}'.format(tuple(round(s, 4) for s in self.scale))
         format_string += ', ratio={0}'.format(tuple(round(r, 4) for r in self.ratio))
@@ -702,6 +661,7 @@ class RandomSizedCrop(RandomResizedCrop):
     """
     Note: This transform is deprecated in favor of RandomResizedCrop.
     """
+
     def __init__(self, *args, **kwargs):
         warnings.warn("The use of the transforms.RandomSizedCrop transform is deprecated, " +
                       "please use transforms.RandomResizedCrop instead.")
@@ -709,7 +669,7 @@ class RandomSizedCrop(RandomResizedCrop):
 
 
 class FiveCrop(object):
-    """Crop the given PIL Image into four corners and the central crop
+    """Crop the given Numpy Image into four corners and the central crop
 
     .. Note::
          This transform returns a tuple of images and there may be a mismatch in the number of
@@ -722,7 +682,7 @@ class FiveCrop(object):
 
     Example:
          >>> transform = Compose([
-         >>>    FiveCrop(size), # this is a list of PIL Images
+         >>>    FiveCrop(size), # this is a list of Numpy Images
          >>>    Lambda(lambda crops: torch.stack([ToTensor()(crop) for crop in crops])) # returns a 4D tensor
          >>> ])
          >>> #In your test loop you can do the following:
@@ -748,7 +708,7 @@ class FiveCrop(object):
 
 
 class TenCrop(object):
-    """Crop the given PIL Image into four corners and the central crop plus the flipped version of
+    """Crop the given Numpy Image into four corners and the central crop plus the flipped version of
     these (horizontal flipping is used by default)
 
     .. Note::
@@ -862,6 +822,7 @@ class ColorJitter(object):
             hue_factor is chosen uniformly from [-hue, hue] or the given [min, max].
             Should have 0<= hue <= 0.5 or -0.5 <= min <= max <= 0.5.
     """
+
     def __init__(self, brightness=0, contrast=0, saturation=0, hue=0):
         self.brightness = self._check_input(brightness, 'brightness')
         self.contrast = self._check_input(contrast, 'contrast')
@@ -924,10 +885,10 @@ class ColorJitter(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Input image.
+            img (Numpy Image): Input image.
 
         Returns:
-            PIL Image: Color jittered image.
+            Numpy Image: Color jittered image.
         """
         transform = self.get_params(self.brightness, self.contrast,
                                     self.saturation, self.hue)
@@ -967,7 +928,7 @@ class RandomRotation(object):
 
     """
 
-    def __init__(self, degrees, resample=False, expand=False, center=None, fill=None):
+    def __init__(self, degrees):
         if isinstance(degrees, numbers.Number):
             if degrees < 0:
                 raise ValueError("If degrees is a single number, it must be positive.")
@@ -976,11 +937,6 @@ class RandomRotation(object):
             if len(degrees) != 2:
                 raise ValueError("If degrees is a sequence, it must be of len 2.")
             self.degrees = degrees
-
-        self.resample = resample
-        self.expand = expand
-        self.center = center
-        self.fill = fill
 
     @staticmethod
     def get_params(degrees):
@@ -1004,7 +960,7 @@ class RandomRotation(object):
 
         angle = self.get_params(self.degrees)
 
-        return F.rotate(img, angle, self.resample, self.expand, self.center, self.fill)
+        return F.rotate(img, angle)
 
     def __repr__(self):
         format_string = self.__class__.__name__ + '(degrees={0}'.format(self.degrees)
@@ -1035,17 +991,10 @@ class RandomAffine(object):
             range (shear[0], shear[1]) will be applied. Else if shear is a tuple or list of 4 values,
             a x-axis shear in (shear[0], shear[1]) and y-axis shear in (shear[2], shear[3]) will be applied.
             Will not apply shear by default
-        resample ({PIL.Image.NEAREST, PIL.Image.BILINEAR, PIL.Image.BICUBIC}, optional):
-            An optional resampling filter. See `filters`_ for more information.
-            If omitted, or if the image has mode "1" or "P", it is set to PIL.Image.NEAREST.
-        fillcolor (tuple or int): Optional fill color (Tuple for RGB Image And int for grayscale) for the area
-            outside the transform in the output image.(Pillow>=5.0.0)
-
-    .. _filters: https://pillow.readthedocs.io/en/latest/handbook/concepts.html#filters
 
     """
 
-    def __init__(self, degrees, translate=None, scale=None, shear=None, resample=False, fillcolor=0):
+    def __init__(self, degrees, translate=None, scale=None, shear=None):
         if isinstance(degrees, numbers.Number):
             if degrees < 0:
                 raise ValueError("If degrees is a single number, it must be positive.")
@@ -1078,7 +1027,7 @@ class RandomAffine(object):
                 self.shear = (-shear, shear)
             else:
                 assert isinstance(shear, (tuple, list)) and \
-                    (len(shear) == 2 or len(shear) == 4), \
+                       (len(shear) == 2 or len(shear) == 4), \
                     "shear should be a list or tuple and it must be of length 2 or 4."
                 # X-Axis shear with [min, max]
                 if len(shear) == 2:
@@ -1087,9 +1036,6 @@ class RandomAffine(object):
                     self.shear = [s for s in shear]
         else:
             self.shear = shear
-
-        self.resample = resample
-        self.fillcolor = fillcolor
 
     @staticmethod
     def get_params(degrees, translate, scale_ranges, shears, img_size):
@@ -1102,8 +1048,8 @@ class RandomAffine(object):
         if translate is not None:
             max_dx = translate[0] * img_size[0]
             max_dy = translate[1] * img_size[1]
-            translations = (np.round(random.uniform(-max_dx, max_dx)),
-                            np.round(random.uniform(-max_dy, max_dy)))
+            translations = (int(np.round(random.uniform(-max_dx, max_dx))),
+                            int(np.round(random.uniform(-max_dy, max_dy))))
         else:
             translations = (0, 0)
 
@@ -1147,7 +1093,7 @@ class RandomAffine(object):
             s += ', fillcolor={fillcolor}'
         s += ')'
         d = dict(self.__dict__)
-        d['resample'] = _pil_interpolation_to_str[d['resample']]
+        d['resample'] = _opencv_interpolation_to_str[d['resample']]
         return s.format(name=self.__class__.__name__, **d)
 
 
@@ -1158,7 +1104,7 @@ class Grayscale(object):
         num_output_channels (int): (1 or 3) number of channels desired for output image
 
     Returns:
-        PIL Image: Grayscale version of the input.
+        Numpy Image: Grayscale version of the input.
          - If ``num_output_channels == 1`` : returned image is single channel
          - If ``num_output_channels == 3`` : returned image is 3 channel with r == g == b
 
@@ -1170,10 +1116,10 @@ class Grayscale(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be converted to grayscale.
+            img (Numpy Image): Image to be converted to grayscale.
 
         Returns:
-            PIL Image: Randomly grayscaled image.
+            Numpy Image: Randomly grayscaled image.
         """
         return F.to_grayscale(img, num_output_channels=self.num_output_channels)
 
@@ -1188,7 +1134,7 @@ class RandomGrayscale(object):
         p (float): probability that image should be converted to grayscale.
 
     Returns:
-        PIL Image: Grayscale version of the input image with probability p and unchanged
+        Numpy Image: Grayscale version of the input image with probability p and unchanged
         with probability (1-p).
         - If input image is 1 channel: grayscale version is 1 channel
         - If input image is 3 channel: grayscale version is 3 channel with r == g == b
@@ -1201,10 +1147,10 @@ class RandomGrayscale(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be converted to grayscale.
+            img (Numpy Image): Image to be converted to grayscale.
 
         Returns:
-            PIL Image: Randomly grayscaled image.
+            Numpy Image: Randomly grayscaled image.
         """
         num_output_channels = 1 if img.mode == 'L' else 3
         if random.random() < self.p:
