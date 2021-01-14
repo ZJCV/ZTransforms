@@ -16,7 +16,7 @@
   <a href="http://commitizen.github.io/cz-cli/"><img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg"></a>
 </p>
 
-参考[pytorch/vision](https://github.com/pytorch/vision/)实现架构，以[imgaug](https://github.com/aleju/imgaug)为后端实现图像数据扩充
+参考[pytorch/vision](https://github.com/pytorch/vision/)实现架构，以[imgaug](https://github.com/aleju/imgaug)为后端实现图像数据扩充。[imgaug](https://github.com/aleju/imgaug)支持的图像格式为`numpy ndarray`，数据类型默认为`uint8`，通道排列顺序为`RGB`。
 
 ## 内容列表
 
@@ -38,6 +38,9 @@
 * zhujian - *Initial work* - [zjykzj](https://github.com/zjykzj)
 
 ## 致谢
+
+* [pytorch/vision](https://github.com/pytorch/vision)
+* [aleju/imgaug](https://github.com/aleju/imgaug)
 
 ```
 @misc{imgaug,
