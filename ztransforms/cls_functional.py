@@ -341,8 +341,9 @@ def perspective(img, startpoints, endpoints, interpolation=cv2.INTER_LINEAR, fil
     if not _is_numpy(img):
         raise TypeError('img should be Numpy Image. Got {}'.format(type(img)))
 
+    height, width = img.shape[:2]
     M = _get_perspective_coeffs(startpoints, endpoints)
-    return cv2.warpPerspective(img, M, img.shape[:2], flags=interpolation, borderValue=fill)
+    return cv2.warpPerspective(img, M, (width, height), flags=interpolation, borderValue=fill)
 
 
 def vflip(img):
