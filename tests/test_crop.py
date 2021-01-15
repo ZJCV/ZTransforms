@@ -52,7 +52,3 @@ def test_crop():
     sum2 = result.sum()
     assert sum2 > 0, "height: {} width: {} oheight: {} owdith: {}".format(height, width, oheight, owidth)
     assert sum2 > sum1, "height: {} width: {} oheight: {} owdith: {}".format(height, width, oheight, owidth)
-
-
-if __name__ == '__main__':
-    test_crop()

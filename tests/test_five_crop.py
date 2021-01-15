@@ -51,7 +51,3 @@ def test_five_crop():
         assert len(results) == len(expected_output)
         for crop_a, crop_b in zip(results, expected_output):
             assert crop_a.any() == crop_b.any()
-
-
-if __name__ == '__main__':
-    test_five_crop()
