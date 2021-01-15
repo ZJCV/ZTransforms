@@ -168,8 +168,12 @@ class Resize(object):
     """
 
     def __init__(self, size, interpolation=None):
-        assert isinstance(size, int) or (isinstance(size, Iterable) and len(size) == 2)
-        self.size = (size, size) if isinstance(size, int) else size
+        super().__init__()
+        if not isinstance(size, (int, Sequence)):
+            raise TypeError("Size should be int or sequence. Got {}".format(type(size)))
+        if isinstance(size, Sequence) and len(size) not in (1, 2):
+            raise ValueError("If size is a sequence, it should have 1 or 2 values")
+        self.size = size
         self.interpolation = interpolation
 
     def __call__(self, img):

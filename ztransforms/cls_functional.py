@@ -133,10 +133,14 @@ def resize(img, size, interpolation=None):
     """
     if not _is_numpy(img):
         raise TypeError('img should be Numpy Image. Got {}'.format(type(img)))
-    if not (isinstance(size, int) or (isinstance(size, Iterable) and len(size) == 2)):
-        raise TypeError('Got inappropriate size arg: {}'.format(size))
+    if not isinstance(size, (int, Sequence)):
+        raise TypeError("Size should be int or sequence. Got {}".format(type(size)))
+    if isinstance(size, Sequence) and len(size) not in (1, 2):
+        raise ValueError("If size is a sequence, it should have 1 or 2 values")
+    if isinstance(size, Sequence) and len(size) == 1:
+        size = size[0]
 
-    w, h = img.shape[:2]
+    h, w = img.shape[:2]
     if isinstance(size, int):
         if (w <= h and w == size) or (h <= w and h == size):
             return img
