@@ -57,6 +57,23 @@ def to_tensor(pic):
         return img
 
 
+def to_numpy_image(pic):
+    """Convert a tensor to ``numpy.ndarray``
+
+    Args:
+        pic (tesnor): Image to be converted to numpy.
+
+    Returns:
+        numpy.ndarray: Converted image.
+    """
+    if not isinstance(pic, torch.Tensor):
+        raise TypeError('pic should be tensor. Got {}'.format(type(pic)))
+
+    assert pic.dim() == 3
+    img = pic.permute(1, 2, 0).contiguous().numpy()
+    return img
+
+
 def normalize(tensor, mean, std, inplace=False):
     """Normalize a tensor image with mean and standard deviation.
 
@@ -246,7 +263,7 @@ def center_crop(img, output_size):
     """
     if isinstance(output_size, numbers.Number):
         output_size = (int(output_size), int(output_size))
-    image_width, image_height = img.size
+    image_height, image_width = img.shape[:2]
     crop_height, crop_width = output_size
     crop_top = int(round((image_height - crop_height) / 2.))
     crop_left = int(round((image_width - crop_width) / 2.))
@@ -370,10 +387,10 @@ def five_crop(img, size):
         msg = "Requested crop size {} is bigger than input size {}"
         raise ValueError(msg.format(size, (image_height, image_width)))
 
-    tl = crop(img, 0, 0, crop_width, crop_height)
-    tr = crop(img, image_width - crop_width, 0, image_width, crop_height)
-    bl = crop(img, 0, image_height - crop_height, crop_width, image_height)
-    br = crop(img, image_width - crop_width, image_height - crop_height, image_width, image_height)
+    tl = crop(img, 0, 0, crop_height, crop_width)
+    tr = crop(img, 0, image_width - crop_width, crop_height, crop_width)
+    bl = crop(img, image_height - crop_height, 0, crop_height, crop_width)
+    br = crop(img, image_height - crop_height, image_width - crop_width, crop_height, crop_width)
     center = center_crop(img, (crop_height, crop_width))
     return (tl, tr, bl, br, center)
 

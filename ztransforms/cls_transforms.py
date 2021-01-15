@@ -97,6 +97,27 @@ class ToTensor(object):
         return self.__class__.__name__ + '()'
 
 
+class ToNumpyImage:
+    """Convert a tensor to Numpy Image.
+
+    Converts a torch.*Tensor of shape C x H x W while preserving the value range.
+    """
+
+    def __call__(self, pic):
+        """
+        Args:
+            pic (Tensor): Image to be converted to Numpy Image.
+
+        Returns:
+            Numpy Image: Image converted to Numpy Image.
+
+        """
+        return F.to_numpy_image(pic)
+
+    def __repr__(self):
+        return self.__class__.__name__
+
+
 class Normalize(object):
     """Normalize a tensor image with mean and standard deviation.
     Given mean: ``(M1,...,Mn)`` and std: ``(S1,..,Sn)`` for ``n`` channels, this transform
@@ -162,8 +183,10 @@ class Resize(object):
         return F.resize(img, self.size, self.interpolation)
 
     def __repr__(self):
-        interpolate_str = 'None' if self.interpolation is None \
-            else interpolate_str = _opencv_interpolation_to_str[self.interpolation]
+        if self.interpolation is None:
+            interpolate_str = 'None'
+        else:
+            interpolate_str = _opencv_interpolation_to_str[self.interpolation]
         return self.__class__.__name__ + '(size={0}, interpolation={1})'.format(self.size, interpolate_str)
 
 
