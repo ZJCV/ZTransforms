@@ -230,22 +230,23 @@ def pad(img, padding, fill=0, padding_mode='constant'):
         pad_bottom = padding[2]
         pad_right = padding[3]
 
-    aug = iaa.CropAndPad(px=(pad_top, pad_right, pad_bottom, pad_left), pad_mode=padding_mode, pad_cval=fill, keep_size=False)
+    aug = iaa.CropAndPad(px=(pad_top, pad_right, pad_bottom, pad_left), pad_mode=padding_mode, pad_cval=fill,
+                         keep_size=False)
     # aug = iaa.CropAndPad(px=(pad_top, pad_right, pad_bottom, pad_left), pad_mode=padding_mode, keep_size=False)
     return aug.augment_image(img)
 
-        # # RGB image
-        # if len(img.shape) == 3:
-        #     aug = iaa.Pad(px=((pad_top, pad_bottom), (pad_left, pad_right)),
-        #                   pad_mode=padding_mode, keep_size=False)
-        #     return aug.augment_image(img)
-        # # Grayscale image
-        # if len(img.shape) == 2:
-        #     aug = iaa.Pad(px=((pad_top, pad_bottom), (pad_left, pad_right)),
-        #                   pad_mode=padding_mode, keep_size=False)
-        #     return aug.augment_image(img)
+    # # RGB image
+    # if len(img.shape) == 3:
+    #     aug = iaa.Pad(px=((pad_top, pad_bottom), (pad_left, pad_right)),
+    #                   pad_mode=padding_mode, keep_size=False)
+    #     return aug.augment_image(img)
+    # # Grayscale image
+    # if len(img.shape) == 2:
+    #     aug = iaa.Pad(px=((pad_top, pad_bottom), (pad_left, pad_right)),
+    #                   pad_mode=padding_mode, keep_size=False)
+    #     return aug.augment_image(img)
 
-        # return img
+    # return img
 
 
 def crop(img, top, left, height, width):
