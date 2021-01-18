@@ -465,11 +465,11 @@ class RandomCrop(object):
             img = F.pad(img, self.padding, self.fill, self.padding_mode)
 
         # pad the width if needed
-        if self.pad_if_needed and img.shape[0] < self.size[1]:
-            img = F.pad(img, (self.size[1] - img.shape[0], 0), self.fill, self.padding_mode)
+        if self.pad_if_needed and img.shape[0] < self.size[0]:
+            img = F.pad(img, (self.size[0] - img.shape[0], 0), self.fill, self.padding_mode)
         # pad the height if needed
-        if self.pad_if_needed and img.shape[1] < self.size[0]:
-            img = F.pad(img, (0, self.size[0] - img.shape[1]), self.fill, self.padding_mode)
+        if self.pad_if_needed and img.shape[1] < self.size[1]:
+            img = F.pad(img, (0, self.size[1] - img.shape[1]), self.fill, self.padding_mode)
 
         i, j, h, w = self.get_params(img, self.size)
 

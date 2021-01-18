@@ -70,8 +70,11 @@ def to_numpy_image(pic):
         raise TypeError('pic should be tensor. Got {}'.format(type(pic)))
 
     assert pic.dim() == 3
-    img = pic.permute(1, 2, 0).contiguous().numpy()
-    return img
+    npimg = pic
+    if pic.is_floating_point():
+        pic = pic.mul(255).byte()
+    npimg = np.transpose(pic.cpu().numpy(), (1, 2, 0))
+    return npimg
 
 
 def normalize(tensor, mean, std, inplace=False):
@@ -212,28 +215,37 @@ def pad(img, padding, fill=0, padding_mode='constant'):
     assert padding_mode in ['constant', 'edge', 'reflect', 'symmetric'], \
         'Padding mode should be either constant, edge, reflect or symmetric'
 
-    if padding_mode == 'constant':
-        return np.pad(img, padding, mode=padding_mode, constant_values=fill)
-    else:
-        if isinstance(padding, int):
-            pad_left = pad_right = pad_top = pad_bottom = padding
-        if isinstance(padding, Sequence) and len(padding) == 2:
-            pad_left = pad_right = padding[0]
-            pad_top = pad_bottom = padding[1]
-        if isinstance(padding, Sequence) and len(padding) == 4:
-            pad_left = padding[0]
-            pad_top = padding[1]
-            pad_right = padding[2]
-            pad_bottom = padding[3]
+    # if padding_mode == 'constant':
+    #     aug = iaa.Pad(px=padding, pad_mode=padding_mode, pad_cval=fill, keep_size=False)
+    #     return aug.augment_image(img)
+    # else:
+    if isinstance(padding, int):
+        pad_left = pad_right = pad_top = pad_bottom = padding
+    if isinstance(padding, Sequence) and len(padding) == 2:
+        pad_top = pad_bottom = padding[0]
+        pad_left = pad_right = padding[1]
+    if isinstance(padding, Sequence) and len(padding) == 4:
+        pad_top = padding[0]
+        pad_left = padding[1]
+        pad_bottom = padding[2]
+        pad_right = padding[3]
 
-        # RGB image
-        if len(img.shape) == 3:
-            img = np.pad(img, ((pad_top, pad_bottom), (pad_left, pad_right), (0, 0)), padding_mode)
-        # Grayscale image
-        if len(img.shape) == 2:
-            img = np.pad(img, ((pad_top, pad_bottom), (pad_left, pad_right)), padding_mode)
+    aug = iaa.CropAndPad(px=(pad_top, pad_right, pad_bottom, pad_left), pad_mode=padding_mode, pad_cval=fill, keep_size=False)
+    # aug = iaa.CropAndPad(px=(pad_top, pad_right, pad_bottom, pad_left), pad_mode=padding_mode, keep_size=False)
+    return aug.augment_image(img)
 
-        return img
+        # # RGB image
+        # if len(img.shape) == 3:
+        #     aug = iaa.Pad(px=((pad_top, pad_bottom), (pad_left, pad_right)),
+        #                   pad_mode=padding_mode, keep_size=False)
+        #     return aug.augment_image(img)
+        # # Grayscale image
+        # if len(img.shape) == 2:
+        #     aug = iaa.Pad(px=((pad_top, pad_bottom), (pad_left, pad_right)),
+        #                   pad_mode=padding_mode, keep_size=False)
+        #     return aug.augment_image(img)
+
+        # return img
 
 
 def crop(img, top, left, height, width):
