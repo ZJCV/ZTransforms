@@ -444,6 +444,11 @@ class RandomCrop(object):
         if w == tw and h == th:
             return 0, 0, h, w
 
+        if h + 1 < th or w + 1 < tw:
+            raise ValueError(
+                "Required crop size {} is larger then input image size {}".format((th, tw), (h, w))
+            )
+
         i = random.randint(0, h - th)
         j = random.randint(0, w - tw)
         return i, j, th, tw
@@ -460,11 +465,11 @@ class RandomCrop(object):
             img = F.pad(img, self.padding, self.fill, self.padding_mode)
 
         # pad the width if needed
-        if self.pad_if_needed and img.size[0] < self.size[1]:
-            img = F.pad(img, (self.size[1] - img.size[0], 0), self.fill, self.padding_mode)
+        if self.pad_if_needed and img.shape[0] < self.size[1]:
+            img = F.pad(img, (self.size[1] - img.shape[0], 0), self.fill, self.padding_mode)
         # pad the height if needed
-        if self.pad_if_needed and img.size[1] < self.size[0]:
-            img = F.pad(img, (0, self.size[0] - img.size[1]), self.fill, self.padding_mode)
+        if self.pad_if_needed and img.shape[1] < self.size[0]:
+            img = F.pad(img, (0, self.size[0] - img.shape[1]), self.fill, self.padding_mode)
 
         i, j, h, w = self.get_params(img, self.size)
 
