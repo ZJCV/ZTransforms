@@ -996,11 +996,11 @@ class RandomRotation(object):
 
     def __repr__(self):
         format_string = self.__class__.__name__ + '(degrees={0}'.format(self.degrees)
-        format_string += ', resample={0}'.format(self.resample)
-        format_string += ', expand={0}'.format(self.expand)
-        if self.center is not None:
-            format_string += ', center={0}'.format(self.center)
-        format_string += ')'
+        # format_string += ', resample={0}'.format(self.resample)
+        # format_string += ', expand={0}'.format(self.expand)
+        # if self.center is not None:
+        #     format_string += ', center={0}'.format(self.center)
+        # format_string += ')'
         return format_string
 
 

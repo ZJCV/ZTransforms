@@ -56,4 +56,4 @@ def test_ten_crop():
             assert len(results) == 10
             for crop_a, crop_b in zip(results, expected_output):
                 # assert crop_a == crop_b
-                assert crop_a.any() == crop_b.any()
+                assert (crop_a == crop_b).all()
