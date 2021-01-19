@@ -492,10 +492,10 @@ class RandomHorizontalFlip(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be flipped.
+            img (Numpy Image): Image to be flipped.
 
         Returns:
-            PIL Image: Randomly flipped image.
+            Numpy Image: Randomly flipped image.
         """
         if random.random() < self.p:
             return F.hflip(img)
@@ -610,7 +610,7 @@ class RandomResizedCrop(object):
         size: expected output size of each edge
         scale: range of size of the origin size cropped
         ratio: range of aspect ratio of the origin aspect ratio cropped
-        interpolation: Default: PIL.Image.BILINEAR
+        interpolation: Default: cv2.INTER_LINEAR
     """
 
     def __init__(self, size, scale=(0.08, 1.0), ratio=(3. / 4., 4. / 3.), interpolation=cv2.INTER_LINEAR):
@@ -756,7 +756,7 @@ class TenCrop(object):
 
     Example:
          >>> transform = Compose([
-         >>>    TenCrop(size), # this is a list of PIL Images
+         >>>    TenCrop(size), # this is a list of Numpy Images
          >>>    Lambda(lambda crops: torch.stack([ToTensor()(crop) for crop in crops])) # returns a 4D tensor
          >>> ])
          >>> #In your test loop you can do the following:
@@ -942,21 +942,6 @@ class RandomRotation(object):
         degrees (sequence or float or int): Range of degrees to select from.
             If degrees is a number instead of sequence like (min, max), the range of degrees
             will be (-degrees, +degrees).
-        resample ({PIL.Image.NEAREST, PIL.Image.BILINEAR, PIL.Image.BICUBIC}, optional):
-            An optional resampling filter. See `filters`_ for more information.
-            If omitted, or if the image has mode "1" or "P", it is set to PIL.Image.NEAREST.
-        expand (bool, optional): Optional expansion flag.
-            If true, expands the output to make it large enough to hold the entire rotated image.
-            If false or omitted, make the output image the same size as the input image.
-            Note that the expand flag assumes rotation around the center and no translation.
-        center (2-tuple, optional): Optional center of rotation.
-            Origin is the upper left corner.
-            Default is the center of the image.
-        fill (n-tuple or int or float): Pixel fill value for area outside the rotated
-            image. If int or float, the value is used for all bands respectively.
-            Defaults to 0 for all bands. This option is only available for ``pillow>=5.2.0``.
-
-    .. _filters: https://pillow.readthedocs.io/en/latest/handbook/concepts.html#filters
 
     """
 
@@ -984,10 +969,10 @@ class RandomRotation(object):
     def __call__(self, img):
         """
         Args:
-            img (PIL Image): Image to be rotated.
+            img (Numpy Image): Image to be rotated.
 
         Returns:
-            PIL Image: Rotated image.
+            Numpy Image: Rotated image.
         """
 
         angle = self.get_params(self.degrees)
@@ -1103,13 +1088,13 @@ class RandomAffine(object):
 
     def __call__(self, img):
         """
-            img (PIL Image): Image to be transformed.
+            img (Numpy Image): Image to be transformed.
 
         Returns:
-            PIL Image: Affine transformed image.
+            Numpy Image: Affine transformed image.
         """
         ret = self.get_params(self.degrees, self.translate, self.scale, self.shear, img.size)
-        return F.affine(img, *ret, resample=self.resample, fillcolor=self.fillcolor)
+        return F.affine(img, *ret)
 
     def __repr__(self):
         s = '{name}(degrees={degrees}'
