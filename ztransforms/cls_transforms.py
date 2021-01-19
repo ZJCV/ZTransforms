@@ -1107,7 +1107,7 @@ class RandomAffine(object):
         Returns:
             Numpy Image: Affine transformed image.
         """
-        ret = self.get_params(self.degrees, self.translate, self.scale, self.shear, img.size)
+        ret = self.get_params(self.degrees, self.translate, self.scale, self.shear, img.shape[:2])
         return F.affine(img, *ret)
 
     def __repr__(self):
@@ -1172,7 +1172,8 @@ class RandomGrayscale(object):
 
     """
 
-    def __init__(self, p=0.1):
+    def __init__(self, p=0.1, num_output_channels=1):
+        self.num_output_channels = num_output_channels
         self.p = p
 
     def __call__(self, img):
@@ -1183,9 +1184,8 @@ class RandomGrayscale(object):
         Returns:
             Numpy Image: Randomly grayscaled image.
         """
-        num_output_channels = 1 if img.mode == 'L' else 3
         if random.random() < self.p:
-            return F.to_grayscale(img, num_output_channels=num_output_channels)
+            return F.to_grayscale(img, num_output_channels=self.num_output_channels)
         return img
 
     def __repr__(self):
