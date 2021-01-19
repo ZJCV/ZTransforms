@@ -852,15 +852,17 @@ class ColorJitter(object):
             or the given [min, max]. Should be non negative numbers.
         hue (float or tuple of float (min, max)): How much to jitter hue.
             hue_factor is chosen uniformly from [-hue, hue] or the given [min, max].
-            Should have 0<= hue <= 0.5 or -0.5 <= min <= max <= 0.5.
     """
 
     def __init__(self, brightness=0, contrast=0, saturation=0, hue=0):
-        self.brightness = self._check_input(brightness, 'brightness')
-        self.contrast = self._check_input(contrast, 'contrast')
-        self.saturation = self._check_input(saturation, 'saturation')
-        self.hue = self._check_input(hue, 'hue', center=0, bound=(-0.5, 0.5),
-                                     clip_first_on_zero=False)
+        # self.brightness = self._check_input(brightness, 'brightness')
+        # self.contrast = self._check_input(contrast, 'contrast')
+        # self.saturation = self._check_input(saturation, 'saturation')
+        # self.hue = self._check_input(hue, 'hue')
+        self.brightness = brightness
+        self.contrast = contrast
+        self.saturation = saturation
+        self.hue = hue
 
     def _check_input(self, value, name, center=1, bound=(0, float('inf')), clip_first_on_zero=True):
         if isinstance(value, numbers.Number):
@@ -894,20 +896,32 @@ class ColorJitter(object):
         transforms = []
 
         if brightness is not None:
-            brightness_factor = random.uniform(brightness[0], brightness[1])
-            transforms.append(Lambda(lambda img: F.adjust_brightness(img, brightness_factor)))
+            transforms.append(Lambda(lambda img: F.adjust_brightness(img, brightness)))
 
         if contrast is not None:
-            contrast_factor = random.uniform(contrast[0], contrast[1])
-            transforms.append(Lambda(lambda img: F.adjust_contrast(img, contrast_factor)))
+            transforms.append(Lambda(lambda img: F.adjust_contrast(img, contrast)))
 
         if saturation is not None:
-            saturation_factor = random.uniform(saturation[0], saturation[1])
-            transforms.append(Lambda(lambda img: F.adjust_saturation(img, saturation_factor)))
+            transforms.append(Lambda(lambda img: F.adjust_saturation(img, saturation)))
 
         if hue is not None:
-            hue_factor = random.uniform(hue[0], hue[1])
-            transforms.append(Lambda(lambda img: F.adjust_hue(img, hue_factor)))
+            transforms.append(Lambda(lambda img: F.adjust_hue(img, hue)))
+
+        # if brightness is not None:
+        #     brightness_factor = random.uniform(brightness[0], brightness[1])
+        #     transforms.append(Lambda(lambda img: F.adjust_brightness(img, brightness_factor)))
+        #
+        # if contrast is not None:
+        #     contrast_factor = random.uniform(contrast[0], contrast[1])
+        #     transforms.append(Lambda(lambda img: F.adjust_contrast(img, contrast_factor)))
+        #
+        # if saturation is not None:
+        #     saturation_factor = random.uniform(saturation[0], saturation[1])
+        #     transforms.append(Lambda(lambda img: F.adjust_saturation(img, saturation_factor)))
+        #
+        # if hue is not None:
+        #     hue_factor = random.uniform(hue[0], hue[1])
+        #     transforms.append(Lambda(lambda img: F.adjust_hue(img, hue_factor)))
 
         random.shuffle(transforms)
         transform = Compose(transforms)

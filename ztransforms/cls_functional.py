@@ -453,7 +453,7 @@ def adjust_brightness(img, brightness_factor):
 
     Args:
         img (Numpy Image): Numpy Image to be adjusted.
-        brightness_factor (float):  How much to adjust the brightness. Can be
+        brightness_factor (int):  How much to adjust the brightness. Can be
             any non negative number. 0 gives a black image, 1 gives the
             original image while 2 increases the brightness by a factor of 2.
 
@@ -462,6 +462,10 @@ def adjust_brightness(img, brightness_factor):
     """
     if not _is_numpy(img):
         raise TypeError('img should be Numpy Image. Got {}'.format(type(img)))
+
+    if brightness_factor < 1 or brightness_factor > 5:
+        raise ValueError(
+            f'brightness_factor({brightness_factor}) is outside of the expected value range (1 <= x <= 5)')
 
     aug = iaa.imgcorruptlike.Brightness(severity=brightness_factor)
     img = aug.augment_image(img)
@@ -473,15 +477,19 @@ def adjust_contrast(img, contrast_factor):
 
     Args:
         img (Numpy Image): Numpy Image to be adjusted.
-        contrast_factor (float): How much to adjust the contrast. Can be any
-            non negative number. 0 gives a solid gray image, 1 gives the
-            original image while 2 increases the contrast by a factor of 2.
+        contrast_factor (int): How much to adjust the contrast.
+            the expected value range (1 <= x <= 5).
+            1 gives the original image while 2 increases the contrast by a factor of 2.
 
     Returns:
         Numpy Image: Contrast adjusted image.
     """
     if not _is_numpy(img):
         raise TypeError('img should be Numpy Image. Got {}'.format(type(img)))
+
+    if contrast_factor < 1 or contrast_factor > 5:
+        raise ValueError(
+            f'contrast_factor({contrast_factor}) is outside of the expected value range (1 <= x <= 5)')
 
     aug = iaa.imgcorruptlike.Contrast(severity=contrast_factor)
     img = aug.augment_image(img)
@@ -493,8 +501,9 @@ def adjust_saturation(img, saturation_factor):
 
     Args:
         img (Numpy Image): Numpy Image to be adjusted.
-        saturation_factor (float):  How much to adjust the saturation. 0 will
-            give a black and white image, 1 will give the original image while
+        saturation_factor (int):  How much to adjust the saturation.
+            the expected value range (1 <= x <= 5).
+            1 will give the original image while
             2 will enhance the saturation by a factor of 2.
 
     Returns:
@@ -502,6 +511,10 @@ def adjust_saturation(img, saturation_factor):
     """
     if not _is_numpy(img):
         raise TypeError('img should be Numpy Image. Got {}'.format(type(img)))
+
+    if saturation_factor < 1 or saturation_factor > 5:
+        raise ValueError(
+            f'saturation_factor({saturation_factor}) is outside of the expected value range (1 <= x <= 5)')
 
     aug = iaa.imgcorruptlike.Saturate(severity=saturation_factor)
     img = aug.augment_image(img)
@@ -515,8 +528,7 @@ def adjust_hue(img, hue_factor):
     cyclically shifting the intensities in the hue channel (H).
     The image is then converted back to original image mode.
 
-    `hue_factor` is the amount of shift in H channel and must be in the
-    interval `[-0.5, 0.5]`.
+    `hue_factor` is the amount of shift in H channel
 
     See `Hue`_ for more details.
 
@@ -524,22 +536,24 @@ def adjust_hue(img, hue_factor):
 
     Args:
         img (Numpy Image): Numpy Image to be adjusted.
-        hue_factor (float):  How much to shift the hue channel. Should be in
-            [-0.5, 0.5]. 0.5 and -0.5 give complete reversal of hue channel in
+        hue_factor (int):  How much to shift the hue channel.
+            This is expected to be in the range -255 to +255
+            5 and -5 give complete reversal of hue channel in
             HSV space in positive and negative direction respectively.
-            0 means no shift. Therefore, both -0.5 and 0.5 will give an image
+            0 means no shift. Therefore, both -5 and 5 will give an image
             with complementary colors while 0 gives the original image.
 
     Returns:
         Numpy Image: Hue adjusted image.
     """
-    if not (-0.5 <= hue_factor <= 0.5):
-        raise ValueError('hue_factor is not in [-0.5, 0.5].'.format(hue_factor))
-
     if not _is_numpy(img):
         raise TypeError('img should be Numpy Image. Got {}'.format(type(img)))
 
-    aug = iaa.color.AddToHue(value=hue_factor * 255, from_colorspace='RGB')
+    if hue_factor < -255 or hue_factor > 255:
+        raise ValueError(
+            f'hue_factor({hue_factor}) is outside of the expected value range (-255 <= x <= 255)')
+
+    aug = iaa.color.AddToHue(value=hue_factor, from_colorspace='RGB')
     img = aug.augment_image(img)
     return img
 
