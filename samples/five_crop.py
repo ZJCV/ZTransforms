@@ -9,7 +9,7 @@
 
 import imageio
 import imgaug as ia
-from ztransforms.cls_transforms import FiveCrop
+from ztransforms import FiveCrop
 
 
 def main():

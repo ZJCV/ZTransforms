@@ -9,7 +9,7 @@
 
 import imageio
 import imgaug as ia
-from ztransforms.cls_transforms import Pad
+from ztransforms import Pad
 
 
 def main():

@@ -10,7 +10,7 @@
 import numpy as np
 import imageio
 import imgaug as ia
-from ztransforms.cls_transforms import ColorJitter
+from ztransforms import ColorJitter
 
 
 def main():

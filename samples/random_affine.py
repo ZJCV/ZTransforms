@@ -9,7 +9,7 @@
 
 import imageio
 import imgaug as ia
-from ztransforms.cls_transforms import RandomAffine
+from ztransforms import RandomAffine
 
 
 def main():

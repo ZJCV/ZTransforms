@@ -9,7 +9,7 @@
 
 import imageio
 import imgaug as ia
-from ztransforms.cls_transforms import RandomResizedCrop
+from ztransforms import RandomResizedCrop
 
 
 def main():

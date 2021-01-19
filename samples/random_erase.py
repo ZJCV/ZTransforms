@@ -9,7 +9,7 @@
 
 import imageio
 import imgaug as ia
-from ztransforms.cls_transforms import RandomErasing, Compose, ToTensor
+from ztransforms import RandomErasing, Compose, ToTensor
 
 
 def main():

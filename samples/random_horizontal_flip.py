@@ -10,7 +10,7 @@
 
 import imageio
 import imgaug as ia
-from ztransforms.cls_transforms import RandomHorizontalFlip
+from ztransforms import RandomHorizontalFlip
 
 
 def main():
