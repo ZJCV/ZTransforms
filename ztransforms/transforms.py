@@ -723,10 +723,10 @@ class RandomPerspective(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Tensor): Image to be Perspectively transformed.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be Perspectively transformed.
 
         Returns:
-            PIL Image or Tensor: Randomly transformed image.
+            PIL Image or Numpy NDArray or Tensor: Randomly transformed image.
         """
 
         fill = self.fill

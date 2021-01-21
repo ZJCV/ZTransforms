@@ -627,7 +627,7 @@ def perspective(
     to have [..., H, W] shape, where ... means an arbitrary number of leading dimensions.
 
     Args:
-        img (PIL Image or Tensor): Image to be transformed.
+        img (PIL Image or Numpy NDArray or Tensor): Image to be transformed.
         startpoints (list of list of ints): List containing four lists of two integers corresponding to four corners
             ``[top-left, top-right, bottom-right, bottom-left]`` of the original image.
         endpoints (list of list of ints): List containing four lists of two integers corresponding to four corners
@@ -643,10 +643,8 @@ def perspective(
             If input is PIL Image, the options is only available for ``Pillow>=5.0.0``.
 
     Returns:
-        PIL Image or Tensor: transformed Image.
+        PIL Image or Numpy NDArray or Tensor: transformed Image.
     """
-
-    coeffs = _get_perspective_coeffs(startpoints, endpoints)
 
     # Backward compatibility with integer value
     if isinstance(interpolation, int):
@@ -659,7 +657,18 @@ def perspective(
     if not isinstance(interpolation, InterpolationMode):
         raise TypeError("Argument interpolation should be a InterpolationMode")
 
-    if not isinstance(img, torch.Tensor):
+    if _is_numpy(img):
+        if interpolation not in cv_modes_mapping.keys():
+            raise ValueError("This interpolation mode is unsupported with Numpy input")
+        cv_interpolation = cv_modes_mapping[interpolation]
+        return F_a.perspective(img, startpoints, endpoints, interpolation=cv_interpolation, fill=fill)
+
+    coeffs = _get_perspective_coeffs(startpoints, endpoints)
+
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
+        if interpolation not in pil_modes_mapping.keys():
+            raise ValueError("This interpolation mode is unsupported with PIL input")
         pil_interpolation = pil_modes_mapping[interpolation]
         return F_pil.perspective(img, coeffs, interpolation=pil_interpolation, fill=fill)
 

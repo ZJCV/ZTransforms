@@ -131,3 +131,14 @@ def vflip(img):
 
     aug = A.VerticalFlip(always_apply=True)
     return aug.apply(img)
+
+
+@torch.jit.unused
+def perspective(img, startpoints, endpoints, interpolation=cv2.INTER_CUBIC, fill=None):
+    if not _is_numpy_image(img):
+        raise TypeError('img should be Numpy NDArray. Got {}'.format(type(img)))
+
+    height, width = img.shape[:2]
+    M = cv2.getPerspectiveTransform(np.float32(startpoints), np.float32(endpoints))
+
+    return cv2.warpPerspective(img, M, (width, height), flags=interpolation, borderValue=fill)
