@@ -122,3 +122,12 @@ def hflip(img):
 
     aug = A.HorizontalFlip(always_apply=True)
     return aug.apply(img)
+
+
+@torch.jit.unused
+def vflip(img):
+    if not _is_numpy_image(img):
+        raise TypeError('img should be Numpy NDArray. Got {}'.format(type(img)))
+
+    aug = A.VerticalFlip(always_apply=True)
+    return aug.apply(img)

@@ -678,8 +678,11 @@ def vflip(img: Tensor) -> Tensor:
     Returns:
         PIL Image or Tensor:  Vertically flipped image.
     """
-    if not isinstance(img, torch.Tensor):
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
         return F_pil.vflip(img)
+    if _is_numpy(img):
+        return F_a.vflip(img)
 
     return F_t.vflip(img)
 
