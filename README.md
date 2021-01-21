@@ -16,7 +16,7 @@
   <a href="http://commitizen.github.io/cz-cli/"><img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg"></a>
 </p>
 
-参考[pytorch/vision](https://github.com/pytorch/vision/)实现架构，以[imgaug](https://github.com/aleju/imgaug)为后端实现图像数据扩充。[imgaug](https://github.com/aleju/imgaug)支持的图像格式为`numpy ndarray`，数据类型默认为`uint8`，通道排列顺序为`RGB`。
+基于[pytorch/vision](https://github.com/pytorch/vision/)实现架构，添加[albumentations-team/albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)后端进行图像增强。`albumentations`输入图像格式为`numpy ndarray`，数据类型为`uint8`，通道排列顺序为`rgb`。
 
 ## 内容列表
 
@@ -29,9 +29,37 @@
 
 ## 背景
 
-[PyTorch](https://github.com/pytorch/pytorch)除了拥有强大的深度学习代码库之外，还额外提供了数据集处理、模型定义以及数据转换的实现[pytorch/vision](https://github.com/pytorch/vision/)。其中[transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms)模块默认以`PIL`为后端（*也可以使用更快的`Pillow-SIMD`，如果安装的话*）提供了多种数据转换功能，比如旋转、翻转、颜色抖动、随机裁剪、中心裁剪等等。不过随着深度学习的发展，越来越多的数据转换功能被发现，而`PIL`库并没有进行实现
+[PyTorch](https://github.com/pytorch/pytorch)提供了官方的数据增强实现：[transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms)。该模块基于`PIL`为后端进行数据增强操作，其优缺点如下：
 
-在网上找到另一个数据扩充功能库[imgaug](https://github.com/aleju/imgaug)，其实现了更多的数据转换函数。所以新建这个代码库，参考[transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms)实现方式，以[imgaug](https://github.com/aleju/imgaug)为后端进行数据转换
+* 优点：
+  1.  简洁清晰的数据架构
+  2.  简单易懂的数据处理流
+  3. 完善的文档介绍
+* 缺点：
+  1.  基于`PIL`后端，提供的图像增强功能有限
+  2.  基于`PIL`后端，相较于其他库的执行速度慢
+ 
+针对于执行速度问题，`torchvision`也意识到了这一点，从`0.8.0`开始进行了改进
+  
+```
+Prior to v0.8.0, transforms in torchvision have traditionally been PIL-centric and presented multiple limitations due to that. Now, since v0.8.0, transforms implementations are Tensor and PIL compatible and we can achieve the following new features:
+
+transform multi-band torch tensor images (with more than 3-4 channels)
+torchscript transforms together with your model for deployment
+support for GPU acceleration
+batched transformation such as for videos
+read and decode data directly as torch tensor with torchscript support (for PNG and JPEG image formats)
+```
+
+* 一方面通过[Pillow-SIMD](https://github.com/uploadcare/pillow-simd)提高`PIL`的执行速度；
+* 另一方面通过`Tensor`操作来实现`GPU`加速
+
+在网上找到两个数据增强库：
+
+* [imgaug](https://github.com/aleju/imgaug)：其实现了更多的数据增强操作；
+* [albumentations-team/albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)：其在不同的后端（`pytorch/imgaug/opencv`）中找出各自最快的增强函数（参考[Benchmarking results](https://github.com/albumentations-team/albumentations#benchmarking-results)）
+
+上述两个数据增强库均实现了类似于`transforms`的数据流操作方式。不过相对而言，个人还是最喜欢官方的实现和使用方式，所以新建这个代码库，基于[transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms)，在原有功能中添加`albumentation`后端实现，同时添加新的数据增强操作（*如果`albumentation`未实现，就使用`imgaug`实现*）
 
 ## 主要维护人员
 
@@ -40,9 +68,23 @@
 ## 致谢
 
 * [pytorch/vision](https://github.com/pytorch/vision)
+* [albumentations-team/albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)
 * [aleju/imgaug](https://github.com/aleju/imgaug)
 
 ```
+@Article{info11020125,
+    AUTHOR = {Buslaev, Alexander and Iglovikov, Vladimir I. and Khvedchenya, Eugene and Parinov, Alex and Druzhinin, Mikhail and Kalinin, Alexandr A.},
+    TITLE = {Albumentations: Fast and Flexible Image Augmentations},
+    JOURNAL = {Information},
+    VOLUME = {11},
+    YEAR = {2020},
+    NUMBER = {2},
+    ARTICLE-NUMBER = {125},
+    URL = {https://www.mdpi.com/2078-2489/11/2/125},
+    ISSN = {2078-2489},
+    DOI = {10.3390/info11020125}
+}
+
 @misc{imgaug,
   author = {Jung, Alexander B.
             and Wada, Kentaro
