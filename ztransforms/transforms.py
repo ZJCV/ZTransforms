@@ -122,7 +122,7 @@ class PILToTensor:
 
 class ConvertImageDtype(torch.nn.Module):
     """Convert a tensor image to the given ``dtype`` and scale the values accordingly
-    This function does not support PIL Image.
+    This function does not support PIL Image and Numpy Image.
 
     Args:
         dtype (torch.dtype): Desired data type of the output
@@ -188,7 +188,7 @@ class ToPILImage:
 
 class Normalize(torch.nn.Module):
     """Normalize a tensor image with mean and standard deviation.
-    This transform does not support PIL Image.
+    This transform does not support PIL Image and Numpy Image.
     Given mean: ``(mean[1],...,mean[n])`` and std: ``(std[1],..,std[n])`` for ``n``
     channels, this transform will normalize each channel of the input
     ``torch.*Tensor`` i.e.,

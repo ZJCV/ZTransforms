@@ -173,7 +173,7 @@ def pil_to_tensor(pic):
 
 def convert_image_dtype(image: torch.Tensor, dtype: torch.dtype = torch.float) -> torch.Tensor:
     """Convert a tensor image to the given ``dtype`` and scale the values accordingly
-    This function does not support PIL Image.
+    This function does not support PIL Image and Numpy Image.
 
     Args:
         image (torch.Tensor): Image to be converted
@@ -296,7 +296,7 @@ def to_pil_image(pic, mode=None):
 
 def normalize(tensor: Tensor, mean: List[float], std: List[float], inplace: bool = False) -> Tensor:
     """Normalize a tensor image with mean and standard deviation.
-    This transform does not support PIL Image.
+    This transform does not support PIL Image and Numpy Image.
 
     .. note::
         This transform acts out of place by default, i.e., it does not mutates the input tensor.
