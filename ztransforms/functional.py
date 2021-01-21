@@ -84,6 +84,8 @@ def _get_image_size(img: Tensor) -> List[int]:
     """
     if isinstance(img, torch.Tensor):
         return F_t._get_image_size(img)
+    if _is_numpy(img):
+        return F_a._get_image_size(img)
 
     return F_pil._get_image_size(img)
 
@@ -305,6 +307,41 @@ def to_pil_image(pic, mode=None):
     return Image.fromarray(npimg, mode=mode)
 
 
+def to_numpy_image(pic):
+    """
+    转换tensor或者PIL图像为Numpy格式
+    Convert a tensor or an PIL to Numpy Image. This transform does not support torchscript.
+
+    Converts a torch.*Tensor of shape C x H x W or a PIL Image of shape
+    W x H to a Numpy Image while preserving the value range.
+
+    Returns:
+        Numpy Image: Image converted to Numpy Image.
+    """
+    if not (isinstance(pic, torch.Tensor) or _is_pil_image(pic)):
+        raise TypeError('pic should be Tensor or PIL Image. Got {}.'.format(type(pic)))
+
+    elif isinstance(pic, torch.Tensor):
+        if pic.ndimension() not in {2, 3}:
+            raise ValueError('pic should be 2/3 dimensional. Got {} dimensions.'.format(pic.ndimension()))
+
+        elif pic.ndimension() == 2:
+            # if 2D image, add channel dimension (CHW)
+            pic = pic.unsqueeze(0)
+
+        # check number of channels
+        if pic.shape[-3] > 4:
+            raise ValueError('pic should not have > 4 channels. Got {} channels.'.format(pic.shape[-3]))
+
+    img = pic
+    if isinstance(pic, torch.Tensor):
+        if pic.is_floating_point():
+            pic = pic.mul(255).byte()
+        img = pic.cpu().numpy()
+
+    return np.array(img)
+
+
 def normalize(tensor: Tensor, mean: List[float], std: List[float], inplace: bool = False) -> Tensor:
     """Normalize a tensor image with mean and standard deviation.
     This transform does not support PIL Image and Numpy Image.
@@ -448,18 +485,21 @@ def crop(img: Tensor, top: int, left: int, height: int, width: int) -> Tensor:
     to have [..., H, W] shape, where ... means an arbitrary number of leading dimensions
 
     Args:
-        img (PIL Image or Tensor): Image to be cropped. (0,0) denotes the top left corner of the image.
+        img (PIL Image or Numpy Image or Tensor): Image to be cropped. (0,0) denotes the top left corner of the image.
         top (int): Vertical component of the top left corner of the crop box.
         left (int): Horizontal component of the top left corner of the crop box.
         height (int): Height of the crop box.
         width (int): Width of the crop box.
 
     Returns:
-        PIL Image or Tensor: Cropped image.
+        PIL Image or Numpy Image or Tensor: Cropped image.
     """
 
-    if not isinstance(img, torch.Tensor):
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
         return F_pil.crop(img, top, left, height, width)
+    if _is_numpy_image(img):
+        return F_a.crop(img, top, left, height, width)
 
     return F_t.crop(img, top, left, height, width)
 
@@ -470,12 +510,12 @@ def center_crop(img: Tensor, output_size: List[int]) -> Tensor:
     to have [..., H, W] shape, where ... means an arbitrary number of leading dimensions
 
     Args:
-        img (PIL Image or Tensor): Image to be cropped.
+        img (PIL Image or Numpy Image or  Tensor): Image to be cropped.
         output_size (sequence or int): (height, width) of the crop box. If int or sequence with single int,
             it is used for both directions.
 
     Returns:
-        PIL Image or Tensor: Cropped image.
+        PIL Image or Numpy Image or Tensor: Cropped image.
     """
     if isinstance(output_size, numbers.Number):
         output_size = (int(output_size), int(output_size))
