@@ -113,3 +113,12 @@ def pad(img, padding, fill=0, padding_mode="constant"):
     aug = A.IAACropAndPad(px=(pad_top, pad_right, pad_bottom, pad_left), pad_mode=padding_mode, pad_cval=fill,
                           keep_size=False).processor
     return aug.augment_image(img)
+
+
+@torch.jit.unused
+def hflip(img):
+    if not _is_numpy_image(img):
+        raise TypeError('img should be Numpy NDArray. Got {}'.format(type(img)))
+
+    aug = A.HorizontalFlip(always_apply=True)
+    return aug.apply(img)

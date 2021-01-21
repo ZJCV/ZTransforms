@@ -568,16 +568,19 @@ def hflip(img: Tensor) -> Tensor:
     """Horizontally flip the given image.
 
     Args:
-        img (PIL Image or Tensor): Image to be flipped. If img
+        img (PIL Image or Numpy NDArray or Tensor): Image to be flipped. If img
             is a Tensor, it is expected to be in [..., H, W] format,
             where ... means it can have an arbitrary number of leading
             dimensions.
 
     Returns:
-        PIL Image or Tensor:  Horizontally flipped image.
+        PIL Image or Numpy NDArray or Tensor:  Horizontally flipped image.
     """
-    if not isinstance(img, torch.Tensor):
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
         return F_pil.hflip(img)
+    if _is_numpy(img):
+        return F_a.hflip(img)
 
     return F_t.hflip(img)
 

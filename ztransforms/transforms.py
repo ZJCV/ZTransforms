@@ -643,10 +643,10 @@ class RandomHorizontalFlip(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Tensor): Image to be flipped.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be flipped.
 
         Returns:
-            PIL Image or Tensor: Randomly flipped image.
+            PIL Image or Numpy NDArray or Tensor: Randomly flipped image.
         """
         if torch.rand(1) < self.p:
             return F.hflip(img)
