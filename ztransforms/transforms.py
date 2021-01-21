@@ -207,7 +207,7 @@ class ToNumpyImage:
             numpy.ndarray: Image converted to Numpy Image.
 
         """
-        return F.to_pil_image(pic)
+        return F.to_numpy_image(pic)
 
     def __repr__(self):
         return self.__class__.__name__
@@ -400,10 +400,10 @@ class Pad(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Tensor): Image to be padded.
+            img (PIL Image or Numpy Image or Tensor): Image to be padded.
 
         Returns:
-            PIL Image or Tensor: Padded image.
+            PIL Image or Numpy Image or Tensor: Padded image.
         """
         return F.pad(img, self.padding, self.fill, self.padding_mode)
 

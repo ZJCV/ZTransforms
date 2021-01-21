@@ -337,7 +337,7 @@ def to_numpy_image(pic):
     if isinstance(pic, torch.Tensor):
         if pic.is_floating_point():
             pic = pic.mul(255).byte()
-        img = pic.cpu().numpy()
+        img = np.transpose(pic.cpu().numpy(), (1, 2, 0))
 
     return np.array(img)
 
@@ -443,7 +443,7 @@ def pad(img: Tensor, padding: List[int], fill: int = 0, padding_mode: str = "con
     to have [..., H, W] shape, where ... means an arbitrary number of leading dimensions
 
     Args:
-        img (PIL Image or Tensor): Image to be padded.
+        img (PIL Image or Numpy Image or Tensor): Image to be padded.
         padding (int or sequence): Padding on each border. If a single int is provided this
             is used to pad all borders. If sequence of length 2 is provided this is the padding
             on left/right and top/bottom respectively. If a sequence of length 4 is provided
@@ -471,10 +471,13 @@ def pad(img: Tensor, padding: List[int], fill: int = 0, padding_mode: str = "con
                          will result in [2, 1, 1, 2, 3, 4, 4, 3]
 
     Returns:
-        PIL Image or Tensor: Padded image.
+        PIL Image or Numpy Image or Tensor: Padded image.
     """
-    if not isinstance(img, torch.Tensor):
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
         return F_pil.pad(img, padding=padding, fill=fill, padding_mode=padding_mode)
+    if _is_numpy(img):
+        return F_a.pad(img, padding=padding, fill=fill, padding_mode=padding_mode)
 
     return F_t.pad(img, padding=padding, fill=fill, padding_mode=padding_mode)
 

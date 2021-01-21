@@ -15,8 +15,10 @@ import torch
 # import torchvision.transforms.functional as F
 
 
-import ztransforms.cls_transforms as transforms
-import ztransforms.cls_functional as F
+# import ztransforms.cls_transforms as transforms
+# import ztransforms.cls_functional as F
+import ztransforms.transforms as transforms
+import ztransforms.functional as F
 
 
 def test_pad():

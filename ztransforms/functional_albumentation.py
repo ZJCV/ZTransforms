@@ -8,6 +8,7 @@
 """
 
 import cv2
+import numbers
 import numpy as np
 import torch
 from typing import List, Tuple, Any, Optional, Sequence
@@ -70,3 +71,45 @@ def crop(img: np.ndarray, top: int, left: int, height: int, width: int) -> np.nd
         raise TypeError('img should be Numpy Image. Got {}'.format(type(img)))
 
     return img[top:top + height, left:left + width]
+
+
+@torch.jit.unused
+def pad(img, padding, fill=0, padding_mode="constant"):
+    if not _is_numpy_image(img):
+        raise TypeError("img should be Numpy Image. Got {}".format(type(img)))
+
+    if not isinstance(padding, (numbers.Number, tuple, list)):
+        raise TypeError("Got inappropriate padding arg")
+    if not isinstance(fill, (numbers.Number, str, tuple)):
+        raise TypeError("Got inappropriate fill arg")
+    if not isinstance(padding_mode, str):
+        raise TypeError("Got inappropriate padding_mode arg")
+
+    if isinstance(padding, list):
+        padding = tuple(padding)
+
+    if isinstance(padding, tuple) and len(padding) not in [1, 2, 4]:
+        raise ValueError("Padding must be an int or a 1, 2, or 4 element tuple, not a " +
+                         "{} element tuple".format(len(padding)))
+
+    if isinstance(padding, tuple) and len(padding) == 1:
+        # Compatibility with `functional_tensor.pad`
+        padding = padding[0]
+
+    if padding_mode not in ["constant", "edge", "reflect", "symmetric"]:
+        raise ValueError("Padding mode should be either constant, edge, reflect or symmetric")
+
+    if isinstance(padding, int):
+        pad_left = pad_right = pad_top = pad_bottom = padding
+    if isinstance(padding, Sequence) and len(padding) == 2:
+        pad_top = pad_bottom = padding[0]
+        pad_left = pad_right = padding[1]
+    if isinstance(padding, Sequence) and len(padding) == 4:
+        pad_top = padding[0]
+        pad_left = padding[1]
+        pad_bottom = padding[2]
+        pad_right = padding[3]
+
+    aug = A.IAACropAndPad(px=(pad_top, pad_right, pad_bottom, pad_left), pad_mode=padding_mode, pad_cval=fill,
+                          keep_size=False).processor
+    return aug.augment_image(img)
