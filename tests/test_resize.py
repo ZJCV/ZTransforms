@@ -12,7 +12,8 @@ from PIL import Image
 # import torchvision.transforms as transforms
 
 
-import ztransforms.cls_transforms as transforms
+# import ztransforms.cls_transforms as transforms
+import ztransforms.transforms as transforms
 
 
 def test_resize():

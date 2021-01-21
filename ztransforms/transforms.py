@@ -265,10 +265,10 @@ class Resize(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Tensor): Image to be scaled.
+            img (PIL Image or Numpy Image or Tensor): Image to be scaled.
 
         Returns:
-            PIL Image or Tensor: Rescaled image.
+            PIL Image or Numpy Image or Tensor: Rescaled image.
         """
         return F.resize(img, self.size, self.interpolation)
 

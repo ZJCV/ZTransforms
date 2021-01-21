@@ -6,6 +6,8 @@ from enum import Enum
 import numpy as np
 from PIL import Image
 
+import cv2
+
 import torch
 from torch import Tensor
 from typing import List, Tuple, Any, Optional
@@ -15,6 +17,7 @@ try:
 except ImportError:
     accimage = None
 
+from . import functional_albumentation as F_a
 from . import functional_pil as F_pil
 from . import functional_tensor as F_t
 
@@ -22,13 +25,19 @@ from . import functional_tensor as F_t
 class InterpolationMode(Enum):
     """Interpolation modes
     """
+    # 最近邻 -> cv2.INTER_NEAREST / PIL.Image.NEAREST
     NEAREST = "nearest"
+    # 双线性 -> cv2.INTER_LINEAR / PIL.Image.BILINEAR
     BILINEAR = "bilinear"
+    # 4x4像素邻域的双三次插值　-> cv2.INTER_CUBIC / PIL.Image.BICUBIC
     BICUBIC = "bicubic"
     # For PIL compatibility
     BOX = "box"
     HAMMING = "hamming"
+    # 8x8像素邻域的Lanczos插值 -> cv2.INTER_LANCZOS4 / PIL.Image.LANCZOS
     LANCZOS = "lanczos"
+    # 像素关系重采样 -> cv2.INTER_AREA
+    AREA = "area"
 
 
 # TODO: Once torchscript supports Enums with staticmethod
@@ -41,6 +50,7 @@ def _interpolation_modes_from_int(i: int) -> InterpolationMode:
         4: InterpolationMode.BOX,
         5: InterpolationMode.HAMMING,
         1: InterpolationMode.LANCZOS,
+        6: InterpolationMode.AREA,
     }
     return inverse_modes_mapping[i]
 
@@ -54,8 +64,19 @@ pil_modes_mapping = {
     InterpolationMode.LANCZOS: 1,
 }
 
+cv_modes_mapping = {
+    InterpolationMode.NEAREST: cv2.INTER_NEAREST,
+    InterpolationMode.BILINEAR: cv2.INTER_LINEAR,
+    InterpolationMode.BICUBIC: cv2.INTER_CUBIC,
+    InterpolationMode.LANCZOS: cv2.INTER_LANCZOS4,
+    InterpolationMode.AREA: cv2.INTER_AREA,
+}
+
 _is_pil_image = F_pil._is_pil_image
 _parse_fill = F_pil._parse_fill
+
+_is_numpy = F_a._is_numpy
+_is_numpy_image = F_a._is_numpy_image
 
 
 def _get_image_size(img: Tensor) -> List[int]:
@@ -76,16 +97,6 @@ def _get_image_num_channels(img: Tensor) -> int:
     return F_pil._get_image_num_channels(img)
 
 
-@torch.jit.unused
-def _is_numpy(img: Any) -> bool:
-    return isinstance(img, np.ndarray)
-
-
-@torch.jit.unused
-def _is_numpy_image(img: Any) -> bool:
-    return img.ndim in {2, 3}
-
-
 def to_tensor(pic):
     """Convert a ``PIL Image`` or ``numpy.ndarray`` to tensor.
     This function does not support torchscript.
@@ -98,7 +109,7 @@ def to_tensor(pic):
     Returns:
         Tensor: Converted image.
     """
-    if not(F_pil._is_pil_image(pic) or _is_numpy(pic)):
+    if not (F_pil._is_pil_image(pic) or _is_numpy(pic)):
         raise TypeError('pic should be PIL Image or ndarray. Got {}'.format(type(pic)))
 
     if _is_numpy(pic) and not _is_numpy_image(pic):
@@ -213,7 +224,7 @@ def to_pil_image(pic, mode=None):
     Returns:
         PIL Image: Image converted to PIL Image.
     """
-    if not(isinstance(pic, torch.Tensor) or isinstance(pic, np.ndarray)):
+    if not (isinstance(pic, torch.Tensor) or isinstance(pic, np.ndarray)):
         raise TypeError('pic should be Tensor or ndarray. Got {}.'.format(type(pic)))
 
     elif isinstance(pic, torch.Tensor):
@@ -368,9 +379,17 @@ def resize(img: Tensor, size: List[int], interpolation: InterpolationMode = Inte
     if not isinstance(interpolation, InterpolationMode):
         raise TypeError("Argument interpolation should be a InterpolationMode")
 
-    if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
+        if interpolation not in pil_modes_mapping.keys():
+            raise ValueError("This interpolation mode is unsupported with PIL input")
         pil_interpolation = pil_modes_mapping[interpolation]
         return F_pil.resize(img, size=size, interpolation=pil_interpolation)
+
+    if _is_numpy_image(img):
+        if interpolation not in cv_modes_mapping.keys():
+            raise ValueError("This interpolation mode is unsupported with Numpy input")
+        cv_interpolation = cv_modes_mapping[interpolation]
+        return F_a.resize(img, size=size, interpolation=cv_interpolation)
 
     return F_t.resize(img, size=size, interpolation=interpolation.value)
 
