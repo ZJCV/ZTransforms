@@ -121,7 +121,7 @@ class PILToTensor:
 
 class ConvertImageDtype(torch.nn.Module):
     """Convert a tensor image to the given ``dtype`` and scale the values accordingly
-    This function does not support PIL Image and Numpy Image.
+    This function does not support PIL Image and Numpy NDArray.
 
     Args:
         dtype (torch.dtype): Desired data type of the output
@@ -189,10 +189,10 @@ class ToPILImage:
 class ToNumpyImage:
     """
     转换tensor或者PIL图像为Numpy格式
-    Convert a tensor or an PIL to Numpy Image. This transform does not support torchscript.
+    Convert a tensor or an PIL to Numpy NDArray. This transform does not support torchscript.
 
     Converts a torch.*Tensor of shape C x H x W or a PIL Image of shape
-    W x H to a Numpy Image while preserving the value range.
+    W x H to a Numpy NDArray while preserving the value range.
     """
 
     def __init__(self):
@@ -201,10 +201,10 @@ class ToNumpyImage:
     def __call__(self, pic):
         """
         Args:
-            pic (Tensor or PIL Image): Image to be converted to Numpy Image.
+            pic (Tensor or PIL Image): Image to be converted to Numpy NDArray.
 
         Returns:
-            numpy.ndarray: Image converted to Numpy Image.
+            numpy.ndarray: Image converted to Numpy NDArray.
 
         """
         return F.to_numpy_image(pic)
@@ -215,7 +215,7 @@ class ToNumpyImage:
 
 class Normalize(torch.nn.Module):
     """Normalize a tensor image with mean and standard deviation.
-    This transform does not support PIL Image and Numpy Image.
+    This transform does not support PIL Image and Numpy NDArray.
     Given mean: ``(mean[1],...,mean[n])`` and std: ``(std[1],..,std[n])`` for ``n``
     channels, this transform will normalize each channel of the input
     ``torch.*Tensor`` i.e.,
@@ -292,10 +292,10 @@ class Resize(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Numpy Image or Tensor): Image to be scaled.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be scaled.
 
         Returns:
-            PIL Image or Numpy Image or Tensor: Rescaled image.
+            PIL Image or Numpy NDArray or Tensor: Rescaled image.
         """
         return F.resize(img, self.size, self.interpolation)
 
@@ -333,10 +333,10 @@ class CenterCrop(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Numpy Image or Tensor): Image to be cropped.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be cropped.
 
         Returns:
-            PIL Image or Numpy Image or Tensor: Cropped image.
+            PIL Image or Numpy NDArray or Tensor: Cropped image.
         """
         return F.center_crop(img, self.size)
 
@@ -400,10 +400,10 @@ class Pad(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Numpy Image or Tensor): Image to be padded.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be padded.
 
         Returns:
-            PIL Image or Numpy Image or Tensor: Padded image.
+            PIL Image or Numpy NDArray or Tensor: Padded image.
         """
         return F.pad(img, self.padding, self.fill, self.padding_mode)
 
@@ -468,7 +468,7 @@ class RandomApply(torch.nn.Module):
         >>> scripted_transforms = torch.jit.script(transforms)
 
         Make sure to use only scriptable transformations, i.e. that work with ``torch.Tensor``, does not require
-        `lambda` functions or ``PIL.Image``.
+        `lambda` functions or ``PIL.Image`` or ``Numpy NDArray``.
 
     Args:
         transforms (sequence or torch.nn.Module): list of transformations
@@ -564,7 +564,7 @@ class RandomCrop(torch.nn.Module):
         """Get parameters for ``crop`` for a random crop.
 
         Args:
-            img (PIL Image or Tensor): Image to be cropped.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be cropped.
             output_size (tuple): Expected output size of the crop.
 
         Returns:
@@ -600,10 +600,10 @@ class RandomCrop(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Tensor): Image to be cropped.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be cropped.
 
         Returns:
-            PIL Image or Tensor: Cropped image.
+            PIL Image or Numpy NDArray or Tensor: Cropped image.
         """
         if self.padding is not None:
             img = F.pad(img, self.padding, self.fill, self.padding_mode)

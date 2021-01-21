@@ -186,7 +186,7 @@ def pil_to_tensor(pic):
 
 def convert_image_dtype(image: torch.Tensor, dtype: torch.dtype = torch.float) -> torch.Tensor:
     """Convert a tensor image to the given ``dtype`` and scale the values accordingly
-    This function does not support PIL Image and Numpy Image.
+    This function does not support PIL Image and Numpy NDArray.
 
     Args:
         image (torch.Tensor): Image to be converted
@@ -310,13 +310,13 @@ def to_pil_image(pic, mode=None):
 def to_numpy_image(pic):
     """
     转换tensor或者PIL图像为Numpy格式
-    Convert a tensor or an PIL to Numpy Image. This transform does not support torchscript.
+    Convert a tensor or an PIL to Numpy NDArray. This transform does not support torchscript.
 
     Converts a torch.*Tensor of shape C x H x W or a PIL Image of shape
-    W x H to a Numpy Image while preserving the value range.
+    W x H to a Numpy NDArray while preserving the value range.
 
     Returns:
-        Numpy Image: Image converted to Numpy Image.
+        Numpy NDArray: Image converted to Numpy NDArray.
     """
     if not (isinstance(pic, torch.Tensor) or _is_pil_image(pic)):
         raise TypeError('pic should be Tensor or PIL Image. Got {}.'.format(type(pic)))
@@ -344,7 +344,7 @@ def to_numpy_image(pic):
 
 def normalize(tensor: Tensor, mean: List[float], std: List[float], inplace: bool = False) -> Tensor:
     """Normalize a tensor image with mean and standard deviation.
-    This transform does not support PIL Image and Numpy Image.
+    This transform does not support PIL Image and Numpy NDArray.
 
     .. note::
         This transform acts out of place by default, i.e., it does not mutates the input tensor.
@@ -443,7 +443,7 @@ def pad(img: Tensor, padding: List[int], fill: int = 0, padding_mode: str = "con
     to have [..., H, W] shape, where ... means an arbitrary number of leading dimensions
 
     Args:
-        img (PIL Image or Numpy Image or Tensor): Image to be padded.
+        img (PIL Image or Numpy NDArray or Tensor): Image to be padded.
         padding (int or sequence): Padding on each border. If a single int is provided this
             is used to pad all borders. If sequence of length 2 is provided this is the padding
             on left/right and top/bottom respectively. If a sequence of length 4 is provided
@@ -471,7 +471,7 @@ def pad(img: Tensor, padding: List[int], fill: int = 0, padding_mode: str = "con
                          will result in [2, 1, 1, 2, 3, 4, 4, 3]
 
     Returns:
-        PIL Image or Numpy Image or Tensor: Padded image.
+        PIL Image or Numpy NDArray or Tensor: Padded image.
     """
     # if not isinstance(img, torch.Tensor):
     if _is_pil_image(img):
@@ -488,14 +488,14 @@ def crop(img: Tensor, top: int, left: int, height: int, width: int) -> Tensor:
     to have [..., H, W] shape, where ... means an arbitrary number of leading dimensions
 
     Args:
-        img (PIL Image or Numpy Image or Tensor): Image to be cropped. (0,0) denotes the top left corner of the image.
+        img (PIL Image or Numpy NDArray or Tensor): Image to be cropped. (0,0) denotes the top left corner of the image.
         top (int): Vertical component of the top left corner of the crop box.
         left (int): Horizontal component of the top left corner of the crop box.
         height (int): Height of the crop box.
         width (int): Width of the crop box.
 
     Returns:
-        PIL Image or Numpy Image or Tensor: Cropped image.
+        PIL Image or Numpy NDArray or Tensor: Cropped image.
     """
 
     # if not isinstance(img, torch.Tensor):
@@ -513,12 +513,12 @@ def center_crop(img: Tensor, output_size: List[int]) -> Tensor:
     to have [..., H, W] shape, where ... means an arbitrary number of leading dimensions
 
     Args:
-        img (PIL Image or Numpy Image or  Tensor): Image to be cropped.
+        img (PIL Image or Numpy NDArray or  Tensor): Image to be cropped.
         output_size (sequence or int): (height, width) of the crop box. If int or sequence with single int,
             it is used for both directions.
 
     Returns:
-        PIL Image or Numpy Image or Tensor: Cropped image.
+        PIL Image or Numpy NDArray or Tensor: Cropped image.
     """
     if isinstance(output_size, numbers.Number):
         output_size = (int(output_size), int(output_size))
