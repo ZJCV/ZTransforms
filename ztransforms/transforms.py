@@ -943,10 +943,10 @@ class FiveCrop(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Tensor): Image to be cropped.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be cropped.
 
         Returns:
-            tuple of 5 images. Image can be PIL Image or Tensor
+            tuple of 5 images. Image can be PIL Image or Numpy NDArray or Tensor
         """
         return F.five_crop(img, self.size)
 
@@ -992,10 +992,10 @@ class TenCrop(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Tensor): Image to be cropped.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be cropped.
 
         Returns:
-            tuple of 10 images. Image can be PIL Image or Tensor
+            tuple of 10 images. Image can be PIL Image or Numpy NDArray or Tensor
         """
         return F.ten_crop(img, self.size, self.vertical_flip)
 

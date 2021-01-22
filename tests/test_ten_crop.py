@@ -12,7 +12,8 @@ import numpy as np
 from PIL import Image
 import random
 # import torchvision.transforms as transforms
-import ztransforms.cls_transforms as transforms
+# import ztransforms.cls_transforms as transforms
+import ztransforms.transforms as transforms
 
 
 def test_ten_crop():

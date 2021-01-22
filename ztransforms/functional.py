@@ -706,7 +706,7 @@ def five_crop(img: Tensor, size: List[int]) -> Tuple[Tensor, Tensor, Tensor, Ten
         mismatch in the number of inputs and targets your ``Dataset`` returns.
 
     Args:
-        img (PIL Image or Tensor): Image to be cropped.
+        img (PIL Image or Numpy NDArray or Tensor): Image to be cropped.
         size (sequence or int): Desired output size of the crop. If size is an
             int instead of sequence like (h, w), a square crop (size, size) is
             made. If provided a sequence of length 1, it will be interpreted as (size[0], size[0]).
@@ -751,7 +751,7 @@ def ten_crop(img: Tensor, size: List[int], vertical_flip: bool = False) -> List[
         mismatch in the number of inputs and targets your ``Dataset`` returns.
 
     Args:
-        img (PIL Image or Tensor): Image to be cropped.
+        img (PIL Image or Numpy NDArray or Tensor): Image to be cropped.
         size (sequence or int): Desired output size of the crop. If size is an
             int instead of sequence like (h, w), a square crop (size, size) is
             made. If provided a sequence of length 1, it will be interpreted as (size[0], size[0]).
