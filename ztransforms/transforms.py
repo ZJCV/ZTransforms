@@ -1154,10 +1154,10 @@ class ColorJitter(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Tensor): Input image.
+            img (PIL Image or Numpy NDArray or Tensor): Input image.
 
         Returns:
-            PIL Image or Tensor: Color jittered image.
+            PIL Image or Numpy NDArray or Tensor: Color jittered image.
         """
         fn_idx, brightness_factor, contrast_factor, saturation_factor, hue_factor = \
             self.get_params(self.brightness, self.contrast, self.saturation, self.hue)

@@ -785,7 +785,7 @@ def adjust_brightness(img: Tensor, brightness_factor: float) -> Tensor:
     """Adjust brightness of an image.
 
     Args:
-        img (PIL Image or Tensor): Image to be adjusted.
+        img (PIL Image or Numpy NDArray or Tensor): Image to be adjusted.
         If img is torch Tensor, it is expected to be in [..., 1 or 3, H, W] format,
         where ... means it can have an arbitrary number of leading dimensions.
         brightness_factor (float):  How much to adjust the brightness. Can be
@@ -793,10 +793,14 @@ def adjust_brightness(img: Tensor, brightness_factor: float) -> Tensor:
             original image while 2 increases the brightness by a factor of 2.
 
     Returns:
-        PIL Image or Tensor: Brightness adjusted image.
+        PIL Image or Numpy NDArray or Tensor: Brightness adjusted image.
     """
-    if not isinstance(img, torch.Tensor):
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
         return F_pil.adjust_brightness(img, brightness_factor)
+
+    if _is_numpy(img):
+        return F_a.adjust_brightness(img, brightness_factor)
 
     return F_t.adjust_brightness(img, brightness_factor)
 
@@ -805,7 +809,7 @@ def adjust_contrast(img: Tensor, contrast_factor: float) -> Tensor:
     """Adjust contrast of an image.
 
     Args:
-        img (PIL Image or Tensor): Image to be adjusted.
+        img (PIL Image or Numpy NDArray or Tensor): Image to be adjusted.
         If img is torch Tensor, it is expected to be in [..., 3, H, W] format,
         where ... means it can have an arbitrary number of leading dimensions.
         contrast_factor (float): How much to adjust the contrast. Can be any
@@ -813,10 +817,14 @@ def adjust_contrast(img: Tensor, contrast_factor: float) -> Tensor:
             original image while 2 increases the contrast by a factor of 2.
 
     Returns:
-        PIL Image or Tensor: Contrast adjusted image.
+        PIL Image or Numpy NDArray or Tensor: Contrast adjusted image.
     """
-    if not isinstance(img, torch.Tensor):
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
         return F_pil.adjust_contrast(img, contrast_factor)
+
+    if _is_numpy(img):
+        return F_a.adjust_contrast(img, contrast_factor)
 
     return F_t.adjust_contrast(img, contrast_factor)
 
@@ -825,7 +833,7 @@ def adjust_saturation(img: Tensor, saturation_factor: float) -> Tensor:
     """Adjust color saturation of an image.
 
     Args:
-        img (PIL Image or Tensor): Image to be adjusted.
+        img (PIL Image or Numpy NDArray or Tensor): Image to be adjusted.
         If img is torch Tensor, it is expected to be in [..., 3, H, W] format,
         where ... means it can have an arbitrary number of leading dimensions.
         saturation_factor (float):  How much to adjust the saturation. 0 will
@@ -833,10 +841,14 @@ def adjust_saturation(img: Tensor, saturation_factor: float) -> Tensor:
             2 will enhance the saturation by a factor of 2.
 
     Returns:
-        PIL Image or Tensor: Saturation adjusted image.
+        PIL Image or Numpy NDArray or Tensor: Saturation adjusted image.
     """
-    if not isinstance(img, torch.Tensor):
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
         return F_pil.adjust_saturation(img, saturation_factor)
+
+    if _is_numpy(img):
+        return F_a.adjust_saturation(img, saturation_factor)
 
     return F_t.adjust_saturation(img, saturation_factor)
 
@@ -856,7 +868,7 @@ def adjust_hue(img: Tensor, hue_factor: float) -> Tensor:
     .. _Hue: https://en.wikipedia.org/wiki/Hue
 
     Args:
-        img (PIL Image or Tensor): Image to be adjusted.
+        img (PIL Image or Numpy NDArray or Tensor): Image to be adjusted.
         If img is torch Tensor, it is expected to be in [..., 3, H, W] format,
         where ... means it can have an arbitrary number of leading dimensions.
         If img is PIL Image mode "1", "L", "I", "F" and modes with transparency (alpha channel) are not supported.
@@ -867,10 +879,14 @@ def adjust_hue(img: Tensor, hue_factor: float) -> Tensor:
             with complementary colors while 0 gives the original image.
 
     Returns:
-        PIL Image or Tensor: Hue adjusted image.
+        PIL Image or Numpy NDArray or Tensor: Hue adjusted image.
     """
-    if not isinstance(img, torch.Tensor):
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
         return F_pil.adjust_hue(img, hue_factor)
+
+    if _is_numpy(img):
+        return F_a.adjust_hue(img, hue_factor)
 
     return F_t.adjust_hue(img, hue_factor)
 

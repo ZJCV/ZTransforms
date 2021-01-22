@@ -142,3 +142,38 @@ def perspective(img, startpoints, endpoints, interpolation=cv2.INTER_CUBIC, fill
     M = cv2.getPerspectiveTransform(np.float32(startpoints), np.float32(endpoints))
 
     return cv2.warpPerspective(img, M, (width, height), flags=interpolation, borderValue=fill)
+
+
+@torch.jit.unused
+def adjust_brightness(img, brightness_factor):
+    if not _is_numpy_image(img):
+        raise TypeError('img should be Numpy NDArray. Got {}'.format(type(img)))
+
+    return A.adjust_brightness_torchvision(img, brightness_factor)
+
+
+@torch.jit.unused
+def adjust_contrast(img, contrast_factor):
+    if not _is_numpy_image(img):
+        raise TypeError('img should be Numpy NDArray. Got {}'.format(type(img)))
+
+    return A.adjust_contrast_torchvision(img, contrast_factor)
+
+
+@torch.jit.unused
+def adjust_saturation(img, saturation_factor):
+    if not _is_numpy_image(img):
+        raise TypeError('img should be Numpy NDArray. Got {}'.format(type(img)))
+
+    return A.adjust_saturation_torchvision(img, saturation_factor)
+
+
+@torch.jit.unused
+def adjust_hue(img, hue_factor):
+    if not (-0.5 <= hue_factor <= 0.5):
+        raise ValueError('hue_factor ({}) is not in [-0.5, 0.5].'.format(hue_factor))
+
+    if not _is_numpy_image(img):
+        raise TypeError('img should be Numpy NDArray. Got {}'.format(type(img)))
+
+    return A.adjust_hue_torchvision(img, hue_factor)
