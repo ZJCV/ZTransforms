@@ -544,7 +544,7 @@ def resized_crop(
     Notably used in :class:`~torchvision.transforms.RandomResizedCrop`.
 
     Args:
-        img (PIL Image or Tensor): Image to be cropped. (0,0) denotes the top left corner of the image.
+        img (PIL Image or Numpy NDArray or Tensor): Image to be cropped. (0,0) denotes the top left corner of the image.
         top (int): Vertical component of the top left corner of the crop box.
         left (int): Horizontal component of the top left corner of the crop box.
         height (int): Height of the crop box.
@@ -557,7 +557,7 @@ def resized_crop(
             For backward compatibility integer values (e.g. ``PIL.Image.NEAREST``) are still acceptable.
 
     Returns:
-        PIL Image or Tensor: Cropped image.
+        PIL Image or Numpy NDArray or Tensor: Cropped image.
     """
     img = crop(img, top, left, height, width)
     img = resize(img, size, interpolation)

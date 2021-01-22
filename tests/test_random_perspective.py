@@ -2,7 +2,7 @@
 
 """
 @date: 2021/1/15 下午5:17
-@file: test_randomperspective.py
+@file: test_random_perspective.py
 @author: zj
 @description: 
 """
@@ -18,7 +18,7 @@ import ztransforms.transforms as transforms
 import ztransforms.functional as F
 
 
-def test_randomperspective():
+def test_random_perspective():
     for _ in range(10):
         height = random.randint(24, 32) * 2
         width = random.randint(24, 32) * 2
