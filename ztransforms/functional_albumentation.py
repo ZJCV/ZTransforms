@@ -177,3 +177,11 @@ def adjust_hue(img, hue_factor):
         raise TypeError('img should be Numpy NDArray. Got {}'.format(type(img)))
 
     return A.adjust_hue_torchvision(img, hue_factor)
+
+
+@torch.jit.unused
+def rotate(img, angle, interpolation=0, expand=False, center=None, fill=None):
+    if not _is_numpy_image(img):
+        raise TypeError("img should be Numpy NDArray. Got {}".format(type(img)))
+
+    return A.rotate(img, angle, interpolation=interpolation, value=fill)

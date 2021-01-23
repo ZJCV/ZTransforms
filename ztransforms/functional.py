@@ -982,7 +982,7 @@ def rotate(
     to have [..., H, W] shape, where ... means an arbitrary number of leading dimensions.
 
     Args:
-        img (PIL Image or Tensor): image to be rotated.
+        img (PIL Image or Numpy NDArray or Tensor): image to be rotated.
         angle (number): rotation angle value in degrees, counter-clockwise.
         interpolation (InterpolationMode): Desired interpolation enum defined by
             :class:`torchvision.transforms.InterpolationMode`. Default is ``InterpolationMode.NEAREST``.
@@ -1001,7 +1001,7 @@ def rotate(
             If input is PIL Image, the options is only available for ``Pillow>=5.2.0``.
 
     Returns:
-        PIL Image or Tensor: Rotated image.
+        PIL Image or Numpy NDArray or Tensor: Rotated image.
 
     .. _filters: https://pillow.readthedocs.io/en/latest/handbook/concepts.html#filters
 
@@ -1029,9 +1029,18 @@ def rotate(
     if not isinstance(interpolation, InterpolationMode):
         raise TypeError("Argument interpolation should be a InterpolationMode")
 
-    if not isinstance(img, torch.Tensor):
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
+        if interpolation not in pil_modes_mapping.keys():
+            raise ValueError("This interpolation mode is unsupported with PIL input")
         pil_interpolation = pil_modes_mapping[interpolation]
         return F_pil.rotate(img, angle=angle, interpolation=pil_interpolation, expand=expand, center=center, fill=fill)
+
+    if _is_numpy_image(img):
+        if interpolation not in cv_modes_mapping.keys():
+            raise ValueError("This interpolation mode is unsupported with Numpy input")
+        cv_interpolation = cv_modes_mapping[interpolation]
+        return F_a.rotate(img, angle=angle, interpolation=cv_interpolation, expand=expand, center=center, fill=fill)
 
     center_f = [0.0, 0.0]
     if center is not None:

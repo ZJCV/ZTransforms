@@ -1254,7 +1254,7 @@ class RandomRotation(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Tensor): Image to be rotated.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be rotated.
 
         Returns:
             PIL Image or Tensor: Rotated image.
