@@ -185,3 +185,22 @@ def rotate(img, angle, interpolation=0, expand=False, center=None, fill=None):
         raise TypeError("img should be Numpy NDArray. Got {}".format(type(img)))
 
     return A.rotate(img, angle, interpolation=interpolation, value=fill)
+
+
+@torch.jit.unused
+def affine(img, angle, translate, scale, shear, interpolation, fill):
+    if not _is_numpy_image(img):
+        raise TypeError('img should be Numpy NDArray. Got {}'.format(type(img)))
+
+    aug = A.IAAAffine(
+        scale=scale,
+        translate_percent=None,
+        translate_px=translate,
+        rotate=angle,
+        shear=shear,
+        order=1,
+        cval=fill,
+        mode=interpolation,
+        always_apply=True
+    )
+    return aug.apply(img)

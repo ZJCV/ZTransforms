@@ -1064,7 +1064,7 @@ def affine(
     to have [..., H, W] shape, where ... means an arbitrary number of leading dimensions.
 
     Args:
-        img (PIL Image or Tensor): image to transform.
+        img (PIL Image or Numpy NDArray or Tensor): image to transform.
         angle (number): rotation angle in degrees between -180 and 180, clockwise direction.
         translate (sequence of integers): horizontal and vertical translations (post-rotation translation)
         scale (float): overall scale
@@ -1086,7 +1086,7 @@ def affine(
             Please use `arg`:interpolation: instead.
 
     Returns:
-        PIL Image or Tensor: Transformed image.
+        PIL Image or Numpy NDArray or Tensor: Transformed image.
     """
     if resample is not None:
         warnings.warn(
@@ -1145,14 +1145,24 @@ def affine(
         raise ValueError("Shear should be a sequence containing two values. Got {}".format(shear))
 
     img_size = _get_image_size(img)
-    if not isinstance(img, torch.Tensor):
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
         # center = (img_size[0] * 0.5 + 0.5, img_size[1] * 0.5 + 0.5)
         # it is visually better to estimate the center without 0.5 offset
         # otherwise image rotated by 90 degrees is shifted vs output image of torch.rot90 or F_t.affine
         center = [img_size[0] * 0.5, img_size[1] * 0.5]
         matrix = _get_inverse_affine_matrix(center, angle, translate, scale, shear)
+
+        if interpolation not in pil_modes_mapping.keys():
+            raise ValueError("This interpolation mode is unsupported with PIL input")
         pil_interpolation = pil_modes_mapping[interpolation]
         return F_pil.affine(img, matrix=matrix, interpolation=pil_interpolation, fill=fill)
+
+    if _is_numpy(img):
+        if interpolation not in cv_modes_mapping.keys():
+            raise ValueError("This interpolation mode is unsupported with Numpy input")
+        cv_interpolation = cv_modes_mapping[interpolation]
+        return F_a.affine(img, angle, translate, scale, shear, cv_interpolation, fill)
 
     translate_f = [1.0 * t for t in translate]
     matrix = _get_inverse_affine_matrix([0.0, 0.0], angle, translate_f, scale, shear)

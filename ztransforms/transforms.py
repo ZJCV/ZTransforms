@@ -1408,10 +1408,10 @@ class RandomAffine(torch.nn.Module):
 
     def forward(self, img):
         """
-            img (PIL Image or Tensor): Image to be transformed.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be transformed.
 
         Returns:
-            PIL Image or Tensor: Affine transformed image.
+            PIL Image or Numpy NDArray or Tensor: Affine transformed image.
         """
         fill = self.fill
         if isinstance(img, Tensor):
