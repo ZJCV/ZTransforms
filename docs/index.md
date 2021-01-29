@@ -50,6 +50,7 @@ read and decode data directly as torch tensor with torchscript support (for PNG 
 * 几何变换
   * Resize(pil/pytorch/albumentation): PIL Image/tensor/ndarray
   * CenterCrop(pil/pytorch/albumentation): PIL Image/tensor/ndarray
+  * Pad(pil/pytorch/albumentation): PIL Image/tensor/ndarray
 * 颜色变换
 * 格式转换
   * ToTensor(pil/pytorch): ndarray/PIL Image/tensor
