@@ -51,6 +51,7 @@ read and decode data directly as torch tensor with torchscript support (for PNG 
   * Resize(pil/pytorch/albumentation): PIL Image/tensor/ndarray
   * CenterCrop(pil/pytorch/albumentation): PIL Image/tensor/ndarray
   * Pad(pil/pytorch/albumentation): PIL Image/tensor/ndarray
+  * RandomCrop(pil/pytorch/albumentation): PIL Image/tensor/ndarray
 * 颜色变换
 * 格式转换
   * ToTensor(pil/pytorch): ndarray/PIL Image/tensor
@@ -59,4 +60,9 @@ read and decode data directly as torch tensor with torchscript support (for PNG 
   * ToPILImage(pil/pytorch): ndarray/tensor
   * Normalize(pil/pytorch): tensor
 * 组合操作
-  * Compose 
+  * Compose
+  * Lambda
+  * RandomApply
+  * RandomChoice
+  * RandomOrder
+  
