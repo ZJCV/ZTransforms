@@ -46,7 +46,7 @@ class Compose:
         >>> )
         >>> scripted_transforms = torch.jit.script(transforms)
 
-        Make sure to use only scriptable transformations, i.e. that work with ``torch.Tensor``, does not require
+        re
         `lambda` functions or ``PIL.Image``.
 
     """
@@ -1466,10 +1466,10 @@ class Grayscale(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Tensor): Image to be converted to grayscale.
+            img (PIL Image or Numpy NDArray or Tensor): Image to be converted to grayscale.
 
         Returns:
-            PIL Image or Tensor: Grayscaled image.
+            PIL Image or Numpy NDArray or Tensor: Grayscaled image.
         """
         return F.rgb_to_grayscale(img, num_output_channels=self.num_output_channels)
 

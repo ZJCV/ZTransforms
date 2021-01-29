@@ -422,7 +422,7 @@ def resize(img: Tensor, size: List[int], interpolation: InterpolationMode = Inte
         pil_interpolation = pil_modes_mapping[interpolation]
         return F_pil.resize(img, size=size, interpolation=pil_interpolation)
 
-    if _is_numpy_image(img):
+    if _is_numpy(img):
         if interpolation not in cv_modes_mapping.keys():
             raise ValueError("This interpolation mode is unsupported with Numpy input")
         cv_interpolation = cv_modes_mapping[interpolation]
@@ -1200,17 +1200,21 @@ def rgb_to_grayscale(img: Tensor, num_output_channels: int = 1) -> Tensor:
         please, consider using meth:`~torchvision.transforms.functional.to_grayscale` with PIL Image.
 
     Args:
-        img (PIL Image or Tensor): RGB Image to be converted to grayscale.
+        img (PIL Image or Numpy NDArray or Tensor): RGB Image to be converted to grayscale.
         num_output_channels (int): number of channels of the output image. Value can be 1 or 3. Default, 1.
 
     Returns:
-        PIL Image or Tensor: Grayscale version of the image.
+        PIL Image or Numpy NDArray or Tensor: Grayscale version of the image.
             if num_output_channels = 1 : returned image is single channel
 
             if num_output_channels = 3 : returned image is 3 channel with r = g = b
     """
-    if not isinstance(img, torch.Tensor):
+    # if not isinstance(img, torch.Tensor):
+    if _is_pil_image(img):
         return F_pil.to_grayscale(img, num_output_channels)
+
+    if _is_numpy(img):
+        return F_a.to_grayscale(img, num_output_channels)
 
     return F_t.rgb_to_grayscale(img, num_output_channels)
 

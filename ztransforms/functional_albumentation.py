@@ -55,14 +55,14 @@ def resize(img, size, interpolation=cv2.INTER_LINEAR):
         if w < h:
             ow = size
             oh = int(size * h / w)
-            return A.resize(img, oh, ow, interpolation)
+            return A.resize(img, oh, ow, interpolation=interpolation)
         else:
             oh = size
             ow = int(size * w / h)
-            return A.resize(img, oh, ow, interpolation)
+            return A.resize(img, oh, ow, interpolation=interpolation)
     else:
         oh, ow = size[:2]
-        return A.resize(img, oh, ow, interpolation)
+        return A.resize(img, oh, ow, interpolation=interpolation)
 
 
 @torch.jit.unused
@@ -204,3 +204,19 @@ def affine(img, angle, translate, scale, shear, interpolation, fill):
         always_apply=True
     )
     return aug.apply(img)
+
+
+@torch.jit.unused
+def to_grayscale(img, num_output_channels):
+    if not _is_numpy_image(img):
+        raise TypeError('img should be Numpy NDArray. Got {}'.format(type(img)))
+
+    if num_output_channels == 1:
+        img = A.to_gray(img)
+    elif num_output_channels == 3:
+        img = A.to_gray(img)
+        img = np.dstack([img, img, img])
+    else:
+        raise ValueError('num_output_channels should be either 1 or 3')
+
+    return img
