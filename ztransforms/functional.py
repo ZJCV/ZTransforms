@@ -501,7 +501,7 @@ def crop(img: Tensor, top: int, left: int, height: int, width: int) -> Tensor:
     # if not isinstance(img, torch.Tensor):
     if _is_pil_image(img):
         return F_pil.crop(img, top, left, height, width)
-    if _is_numpy_image(img):
+    if _is_numpy(img):
         return F_a.crop(img, top, left, height, width)
 
     return F_t.crop(img, top, left, height, width)
