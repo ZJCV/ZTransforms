@@ -43,28 +43,46 @@ read and decode data directly as torch tensor with torchscript support (for PNG 
 
 模式如下：
 
-* <函数名>（后端实现一/后端实现二/...）：<输入格式一/输入格式二/...>
+* <函数名>（后端实现一/后端实现二/...）
 
 图像增强操作如下：
 
 * 几何变换
-  * Resize(pil/pytorch/albumentation): PIL Image/tensor/ndarray
-  * CenterCrop(pil/pytorch/albumentation): PIL Image/tensor/ndarray
-  * Pad(pil/pytorch/albumentation): PIL Image/tensor/ndarray
-  * RandomCrop(pil/pytorch/albumentation): PIL Image/tensor/ndarray
-  * RandomHorizontalFlip(pil/pytorch/albumentation): PIL Image/tensor/ndarray
-  * RandomVerticalFlip(pil/pytorch/albumentation): PIL Image/tensor/ndarray
+  * Resize(pil/pytorch/albumentation)：随机缩放
+  * Pad(pil/pytorch/albumentation)：填充
+  * CenterCrop(pil/pytorch/albumentation)：中心裁剪
+  * RandomCrop(pil/pytorch/albumentation)：随机裁剪
+  * RandomResizedCrop(pil/pytorch/albumentation)：随机缩放裁剪
+  * RandomHorizontalFlip(pil/pytorch/albumentation)：随机水平翻转
+  * RandomVerticalFlip(pil/pytorch/albumentation)：随机竖直翻转
+  * FiveCrop(pil/pytorch/albumentation)：5次裁剪(左上角、左下角、右上角、右下角、中心)
+  * TenCrop(pil/pytorch/albumentation)：5次裁剪加上水平（或者垂直，自己指定）翻转后的5次裁剪
+  * RandomRotation：随机旋转
+  * LinearTransformation：线性转换
+  * RandomAffine：随机仿射
+  * RandomPerspective：随机透视
 * 颜色变换
+  * Normalize(pil/pytorch)：标准化
+  * ColorJitter：颜色抖动（亮度、对比度、饱和度、色度）
+  * Grayscale：灰度化
+  * RandomGrayscale：随机灰度化
+  * RandomErasing：随机擦除
+  * GaussianBlur：高斯模糊
+  * RandomInvert：随机反向像素值
+  * RandomPosterize：
+  * RandomSolarize
+  * RandomAdjustSharpness：随机调整锐度
+  * RandomAutocontrast：随机调整对比度
+  * RandomEqualize：随机均衡化
 * 格式转换
-  * ToTensor(pil/pytorch): ndarray/PIL Image/tensor
-  * PILToTensor(pil/pytorch/): PIL Image
-  * ConvertImageDtype(pil/pytorch): tensor
-  * ToPILImage(pil/pytorch): ndarray/tensor
-  * Normalize(pil/pytorch): tensor
+  * ToTensor(pil/pytorch)：转换为Tensor
+  * PILToTensor(pil/pytorch/)：PIL Image转换为Tensor
+  * ConvertImageDtype(pil/pytorch)：转换图像数据格式
+  * ToPILImage(pil/pytorch)：转换为PIL Image
 * 组合操作
-  * Compose
+  * Compose：组合
   * Lambda
-  * RandomApply
-  * RandomChoice
-  * RandomOrder
+  * RandomApply：对增强列表中的操作按概率执行
+  * RandomChoice：随机选择一个增强列表中的操作
+  * RandomOrder：随机排序增强列表
   

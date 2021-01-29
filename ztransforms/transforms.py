@@ -836,7 +836,7 @@ class RandomResizedCrop(torch.nn.Module):
         """Get parameters for ``crop`` for a random sized crop.
 
         Args:
-            img (PIL Image or Numpy NDArray or Tensor): Input image.
+            img (PIL Image or Tensor or NDArray): Input image.
             scale (list): range of scale of the origin size cropped
             ratio (list): range of aspect ratio of the origin aspect ratio cropped
 
@@ -880,10 +880,10 @@ class RandomResizedCrop(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Numpy NDArray or Tensor): Image to be cropped and resized.
+            img (PIL Image or Tensor or NDArray): Image to be cropped and resized.
 
         Returns:
-            PIL Image or Numpy NDArray or Tensor: Randomly cropped and resized image.
+            PIL Image or Tensor or NDArray: Randomly cropped and resized image.
         """
         i, j, h, w = self.get_params(img, self.scale, self.ratio)
         return F.resized_crop(img, i, j, h, w, self.size, self.interpolation)

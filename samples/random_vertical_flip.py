@@ -7,21 +7,29 @@
 @description: 
 """
 
-
+import torch
 import imageio
 import imgaug as ia
-from ztransforms import RandomVerticalFlip
+
+from ztransforms.transforms import RandomVerticalFlip
+from samples.base_sample import BaseSample
 
 
-def main():
-    img = imageio.imread('./assets/building.jpg')
-    res_list = list()
-    for i in range(1, 10):
-        transform = RandomVerticalFlip()
-        res = transform(img)
-        res_list.append(res)
-    ia.show_grid(res_list)
+class RandomVerticalFlipSample(BaseSample):
+
+    def __init__(self):
+        super().__init__(RandomVerticalFlip)
+
+    def run(self):
+        for name, func in self.func_dict.items():
+            print(name)
+            torch.manual_seed(0)
+            res_list = list()
+            for i in range(1, 10):
+                img = imageio.imread('./assets/building.jpg')
+                res_list.append(func(img, p=0.5))
+            ia.show_grid(res_list)
 
 
 if __name__ == '__main__':
-    main()
+    RandomVerticalFlipSample().run()

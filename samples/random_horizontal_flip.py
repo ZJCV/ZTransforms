@@ -32,5 +32,4 @@ class RandomHorizontalFlipSample(BaseSample):
 
 
 if __name__ == '__main__':
-    model = RandomHorizontalFlipSample()
-    model.run()
+    RandomHorizontalFlipSample().run()
