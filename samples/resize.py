@@ -9,50 +9,26 @@
 
 import imageio
 import imgaug as ia
-from ztransforms.transforms import Compose, Resize, ToPILImage, ToTensor, ToNumpyImage
+
+from samples.base_sample import BaseSample
+from ztransforms.transforms import Resize
 
 
-def resize_pil(img, size):
-    """
-    :param img: ndarray
-    """
-    transform = Compose([
-        ToPILImage(),
-        Resize(size),
-        ToNumpyImage(),
-    ])
-    return transform(img)
+class ResizeSample(BaseSample):
 
+    def __init__(self):
+        super().__init__(Resize)
 
-def resize_tensor(img, size):
-    transform = Compose([
-        ToTensor(),
-        Resize(size),
-        ToNumpyImage(),
-    ])
-    return transform(img)
-
-
-def resize_numpy(img, size):
-    transform = Resize(size)
-    return transform(img)
-
-
-def main():
-    func_dict = {
-        'resize_pil': resize_pil,
-        'resize_tensor': resize_tensor,
-        'resize_numpy': resize_numpy
-    }
-    for name, func in func_dict.items():
-        print(name)
-        res_list = list()
-        for i in range(1, 10):
-            size = i * 80
-            img = imageio.imread('./assets/building.jpg')
-            res_list.append(func(img, size))
-        ia.show_grid(res_list)
+    def run(self):
+        for name, func in self.func_dict.items():
+            print(name)
+            res_list = list()
+            for i in range(1, 10):
+                size = i * 80
+                img = imageio.imread('./assets/building.jpg')
+                res_list.append(func(img, size=size))
+            ia.show_grid(res_list)
 
 
 if __name__ == '__main__':
-    main()
+    ResizeSample().run()

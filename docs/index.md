@@ -52,6 +52,8 @@ read and decode data directly as torch tensor with torchscript support (for PNG 
   * CenterCrop(pil/pytorch/albumentation): PIL Image/tensor/ndarray
   * Pad(pil/pytorch/albumentation): PIL Image/tensor/ndarray
   * RandomCrop(pil/pytorch/albumentation): PIL Image/tensor/ndarray
+  * RandomHorizontalFlip(pil/pytorch/albumentation): PIL Image/tensor/ndarray
+  * RandomVerticalFlip(pil/pytorch/albumentation): PIL Image/tensor/ndarray
 * 颜色变换
 * 格式转换
   * ToTensor(pil/pytorch): ndarray/PIL Image/tensor

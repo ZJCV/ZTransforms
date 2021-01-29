@@ -292,10 +292,10 @@ class Resize(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Numpy NDArray or Tensor): Image to be scaled.
+            img (PIL Image or Tensor or NDArray): Image to be scaled.
 
         Returns:
-            PIL Image or Numpy NDArray or Tensor: Rescaled image.
+            PIL Image or Tensor or NDArray: Rescaled image.
         """
         return F.resize(img, self.size, self.interpolation)
 
@@ -400,10 +400,10 @@ class Pad(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Numpy NDArray or Tensor): Image to be padded.
+            img (PIL Image or Tensor or NDArray): Image to be padded.
 
         Returns:
-            PIL Image or Numpy NDArray or Tensor: Padded image.
+            PIL Image or Tensor or NDArray: Padded image.
         """
         return F.pad(img, self.padding, self.fill, self.padding_mode)
 
@@ -564,7 +564,7 @@ class RandomCrop(torch.nn.Module):
         """Get parameters for ``crop`` for a random crop.
 
         Args:
-            img (PIL Image or Numpy NDArray or Tensor): Image to be cropped.
+            img (PIL Image or Tensor or NDArray): Image to be cropped.
             output_size (tuple): Expected output size of the crop.
 
         Returns:
@@ -600,10 +600,10 @@ class RandomCrop(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Numpy NDArray or Tensor): Image to be cropped.
+            img (PIL Image or Tensor or NDArray): Image to be cropped.
 
         Returns:
-            PIL Image or Numpy NDArray or Tensor: Cropped image.
+            PIL Image or Tensor or NDArray: Cropped image.
         """
         if self.padding is not None:
             img = F.pad(img, self.padding, self.fill, self.padding_mode)
@@ -643,10 +643,10 @@ class RandomHorizontalFlip(torch.nn.Module):
     def forward(self, img):
         """
         Args:
-            img (PIL Image or Numpy NDArray or Tensor): Image to be flipped.
+            img (PIL Image or Tensor or NDArray): Image to be flipped.
 
         Returns:
-            PIL Image or Numpy NDArray or Tensor: Randomly flipped image.
+            PIL Image or Tensor or NDArray: Randomly flipped image.
         """
         if torch.rand(1) < self.p:
             return F.hflip(img)

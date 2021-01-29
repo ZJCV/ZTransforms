@@ -17,7 +17,7 @@ try:
 except ImportError:
     accimage = None
 
-from . import functional_albumentation as F_a
+from . import functional_numpy as F_n
 from . import functional_pil as F_pil
 from . import functional_tensor as F_t
 
@@ -75,8 +75,8 @@ cv_modes_mapping = {
 _is_pil_image = F_pil._is_pil_image
 _parse_fill = F_pil._parse_fill
 
-_is_numpy = F_a._is_numpy
-_is_numpy_image = F_a._is_numpy_image
+_is_numpy = F_n._is_numpy
+_is_numpy_image = F_n._is_numpy_image
 
 
 def _get_image_size(img: Tensor) -> List[int]:
@@ -85,7 +85,7 @@ def _get_image_size(img: Tensor) -> List[int]:
     if isinstance(img, torch.Tensor):
         return F_t._get_image_size(img)
     if _is_numpy(img):
-        return F_a._get_image_size(img)
+        return F_n._get_image_size(img)
 
     return F_pil._get_image_size(img)
 
@@ -426,7 +426,7 @@ def resize(img: Tensor, size: List[int], interpolation: InterpolationMode = Inte
         if interpolation not in cv_modes_mapping.keys():
             raise ValueError("This interpolation mode is unsupported with Numpy input")
         cv_interpolation = cv_modes_mapping[interpolation]
-        return F_a.resize(img, size=size, interpolation=cv_interpolation)
+        return F_n.resize(img, size=size, interpolation=cv_interpolation)
 
     return F_t.resize(img, size=size, interpolation=interpolation.value)
 
@@ -471,13 +471,12 @@ def pad(img: Tensor, padding: List[int], fill: int = 0, padding_mode: str = "con
                          will result in [2, 1, 1, 2, 3, 4, 4, 3]
 
     Returns:
-        PIL Image or Numpy NDArray or Tensor: Padded image.
+        PIL Image or Tensor or NDArray: Padded image.
     """
-    # if not isinstance(img, torch.Tensor):
     if _is_pil_image(img):
         return F_pil.pad(img, padding=padding, fill=fill, padding_mode=padding_mode)
     if _is_numpy(img):
-        return F_a.pad(img, padding=padding, fill=fill, padding_mode=padding_mode)
+        return F_n.pad(img, padding=padding, fill=fill, padding_mode=padding_mode)
 
     return F_t.pad(img, padding=padding, fill=fill, padding_mode=padding_mode)
 
@@ -495,14 +494,14 @@ def crop(img: Tensor, top: int, left: int, height: int, width: int) -> Tensor:
         width (int): Width of the crop box.
 
     Returns:
-        PIL Image or Numpy NDArray or Tensor: Cropped image.
+        PIL Image or Tensor or NDArray: Cropped image.
     """
 
     # if not isinstance(img, torch.Tensor):
     if _is_pil_image(img):
         return F_pil.crop(img, top, left, height, width)
     if _is_numpy(img):
-        return F_a.crop(img, top, left, height, width)
+        return F_n.crop(img, top, left, height, width)
 
     return F_t.crop(img, top, left, height, width)
 
@@ -568,19 +567,19 @@ def hflip(img: Tensor) -> Tensor:
     """Horizontally flip the given image.
 
     Args:
-        img (PIL Image or Numpy NDArray or Tensor): Image to be flipped. If img
+        img (PIL Image or Tensor or NDArray): Image to be flipped. If img
             is a Tensor, it is expected to be in [..., H, W] format,
             where ... means it can have an arbitrary number of leading
             dimensions.
 
     Returns:
-        PIL Image or Numpy NDArray or Tensor:  Horizontally flipped image.
+        PIL Image or Tensor or NDArray:  Horizontally flipped image.
     """
     # if not isinstance(img, torch.Tensor):
     if _is_pil_image(img):
         return F_pil.hflip(img)
     if _is_numpy(img):
-        return F_a.hflip(img)
+        return F_n.hflip(img)
 
     return F_t.hflip(img)
 
@@ -661,7 +660,7 @@ def perspective(
         if interpolation not in cv_modes_mapping.keys():
             raise ValueError("This interpolation mode is unsupported with Numpy input")
         cv_interpolation = cv_modes_mapping[interpolation]
-        return F_a.perspective(img, startpoints, endpoints, interpolation=cv_interpolation, fill=fill)
+        return F_n.perspective(img, startpoints, endpoints, interpolation=cv_interpolation, fill=fill)
 
     coeffs = _get_perspective_coeffs(startpoints, endpoints)
 
@@ -691,7 +690,7 @@ def vflip(img: Tensor) -> Tensor:
     if _is_pil_image(img):
         return F_pil.vflip(img)
     if _is_numpy(img):
-        return F_a.vflip(img)
+        return F_n.vflip(img)
 
     return F_t.vflip(img)
 
@@ -800,7 +799,7 @@ def adjust_brightness(img: Tensor, brightness_factor: float) -> Tensor:
         return F_pil.adjust_brightness(img, brightness_factor)
 
     if _is_numpy(img):
-        return F_a.adjust_brightness(img, brightness_factor)
+        return F_n.adjust_brightness(img, brightness_factor)
 
     return F_t.adjust_brightness(img, brightness_factor)
 
@@ -824,7 +823,7 @@ def adjust_contrast(img: Tensor, contrast_factor: float) -> Tensor:
         return F_pil.adjust_contrast(img, contrast_factor)
 
     if _is_numpy(img):
-        return F_a.adjust_contrast(img, contrast_factor)
+        return F_n.adjust_contrast(img, contrast_factor)
 
     return F_t.adjust_contrast(img, contrast_factor)
 
@@ -848,7 +847,7 @@ def adjust_saturation(img: Tensor, saturation_factor: float) -> Tensor:
         return F_pil.adjust_saturation(img, saturation_factor)
 
     if _is_numpy(img):
-        return F_a.adjust_saturation(img, saturation_factor)
+        return F_n.adjust_saturation(img, saturation_factor)
 
     return F_t.adjust_saturation(img, saturation_factor)
 
@@ -886,7 +885,7 @@ def adjust_hue(img: Tensor, hue_factor: float) -> Tensor:
         return F_pil.adjust_hue(img, hue_factor)
 
     if _is_numpy(img):
-        return F_a.adjust_hue(img, hue_factor)
+        return F_n.adjust_hue(img, hue_factor)
 
     return F_t.adjust_hue(img, hue_factor)
 
@@ -1040,7 +1039,7 @@ def rotate(
         if interpolation not in cv_modes_mapping.keys():
             raise ValueError("This interpolation mode is unsupported with Numpy input")
         cv_interpolation = cv_modes_mapping[interpolation]
-        return F_a.rotate(img, angle=angle, interpolation=cv_interpolation, expand=expand, center=center, fill=fill)
+        return F_n.rotate(img, angle=angle, interpolation=cv_interpolation, expand=expand, center=center, fill=fill)
 
     center_f = [0.0, 0.0]
     if center is not None:
@@ -1162,7 +1161,7 @@ def affine(
         if interpolation not in cv_modes_mapping.keys():
             raise ValueError("This interpolation mode is unsupported with Numpy input")
         cv_interpolation = cv_modes_mapping[interpolation]
-        return F_a.affine(img, angle, translate, scale, shear, cv_interpolation, fill)
+        return F_n.affine(img, angle, translate, scale, shear, cv_interpolation, fill)
 
     translate_f = [1.0 * t for t in translate]
     matrix = _get_inverse_affine_matrix([0.0, 0.0], angle, translate_f, scale, shear)
@@ -1214,7 +1213,7 @@ def rgb_to_grayscale(img: Tensor, num_output_channels: int = 1) -> Tensor:
         return F_pil.to_grayscale(img, num_output_channels)
 
     if _is_numpy(img):
-        return F_a.to_grayscale(img, num_output_channels)
+        return F_n.to_grayscale(img, num_output_channels)
 
     return F_t.rgb_to_grayscale(img, num_output_channels)
 

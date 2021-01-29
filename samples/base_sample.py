@@ -7,9 +7,7 @@
 @description: 
 """
 
-import imageio
-import imgaug as ia
-from ztransforms.transforms import CenterCrop, Compose, ToPILImage, ToNumpyImage, ToTensor
+from ztransforms.transforms import Compose, ToPILImage, ToNumpyImage, ToTensor
 
 
 class BaseSample:
@@ -23,24 +21,24 @@ class BaseSample:
             'transform_numpy': self.transform_numpy
         }
 
-    def transform_pil(self, img, size):
+    def transform_pil(self, img, **kwargs):
         transform = Compose([
             ToPILImage(),
-            self.func(size),
+            self.func(**kwargs),
             ToNumpyImage(),
         ])
         return transform(img)
 
-    def transform_tensor(self, img, size):
+    def transform_tensor(self, img, **kwargs):
         transform = Compose([
             ToTensor(),
-            self.func(size),
+            self.func(**kwargs),
             ToNumpyImage(),
         ])
         return transform(img)
 
-    def transform_numpy(self, img, size):
-        transform = self.func(size)
+    def transform_numpy(self, img, **kwargs):
+        transform = self.func(**kwargs)
         return transform(img)
 
     def run(self):

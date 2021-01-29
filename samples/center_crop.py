@@ -9,50 +9,25 @@
 
 import imageio
 import imgaug as ia
-from ztransforms.transforms import CenterCrop, Compose, ToPILImage, ToNumpyImage, ToTensor
+from samples.base_sample import BaseSample
+from ztransforms.transforms import CenterCrop
 
 
-def transform_pil(img, size):
-    """
-    :param img: ndarray
-    """
-    transform = Compose([
-        ToPILImage(),
-        CenterCrop(size),
-        ToNumpyImage(),
-    ])
-    return transform(img)
+class CenterCropSample(BaseSample):
 
+    def __init__(self):
+        super().__init__(CenterCrop)
 
-def transform_tensor(img, size):
-    transform = Compose([
-        ToTensor(),
-        CenterCrop(size),
-        ToNumpyImage(),
-    ])
-    return transform(img)
-
-
-def transform_numpy(img, size):
-    transform = CenterCrop(size)
-    return transform(img)
-
-
-def main():
-    func_dict = {
-        'transform_pil': transform_pil,
-        'transform_tensor': transform_tensor,
-        'transform_numpy': transform_numpy
-    }
-    for name, func in func_dict.items():
-        print(name)
-        res_list = list()
-        for i in range(1, 10):
-            size = i * 40
-            img = imageio.imread('./assets/building.jpg')
-            res_list.append(func(img, size))
-        ia.show_grid(res_list)
+    def run(self):
+        for name, func in self.func_dict.items():
+            print(name)
+            res_list = list()
+            for i in range(1, 10):
+                size = i * 40
+                img = imageio.imread('./assets/building.jpg')
+                res_list.append(func(img, size=size))
+            ia.show_grid(res_list)
 
 
 if __name__ == '__main__':
-    main()
+    CenterCropSample().run()

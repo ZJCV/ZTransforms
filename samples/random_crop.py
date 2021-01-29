@@ -28,10 +28,10 @@ class RandomCropSample(BaseSample):
             for i in range(1, 10):
                 size = i * 40
                 img = imageio.imread('./assets/building.jpg')
-                res_list.append(func(img, size))
+                res_list.append(
+                    func(img, size=size, padding=None, pad_if_needed=False, fill=0, padding_mode="constant"))
             ia.show_grid(res_list)
 
 
 if __name__ == '__main__':
-    model = RandomCropSample()
-    model.run()
+    RandomCropSample().run()

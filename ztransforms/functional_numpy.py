@@ -2,7 +2,7 @@
 
 """
 @date: 2021/1/21 上午10:12
-@file: functional_albumentation.py
+@file: functional_numpy.py
 @author: zj
 @description: 
 """
@@ -55,14 +55,13 @@ def resize(img, size, interpolation=cv2.INTER_LINEAR):
         if w < h:
             ow = size
             oh = int(size * h / w)
-            return A.resize(img, oh, ow, interpolation=interpolation)
         else:
             oh = size
             ow = int(size * w / h)
-            return A.resize(img, oh, ow, interpolation=interpolation)
     else:
         oh, ow = size[:2]
-        return A.resize(img, oh, ow, interpolation=interpolation)
+    aug = A.Resize(oh, ow, interpolation=interpolation, always_apply=True)
+    return aug.apply(img)
 
 
 @torch.jit.unused
@@ -70,7 +69,8 @@ def crop(img: np.ndarray, top: int, left: int, height: int, width: int) -> np.nd
     if not _is_numpy_image(img):
         raise TypeError('img should be Numpy Image. Got {}'.format(type(img)))
 
-    return img[top:top + height, left:left + width]
+    aug = A.Crop(x_min=left, y_min=top, x_max=left + width, y_max=top + height, always_apply=True)
+    return aug.apply(img)
 
 
 @torch.jit.unused
