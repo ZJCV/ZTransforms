@@ -8,7 +8,7 @@
  <div align="center"><a title="" href="https://github.com/ZJCV/ZTransforms.git"><img align="center" src="./imgs/ZTransforms.png"></a></div>
 
 <p align="center">
-  «ZTransforms»是一个图像数据扩充代码库
+  «ZTransforms»是一个图像数据增强代码库
 <br>
 <br>
   <a href="https://github.com/RichardLitt/standard-readme"><img src="https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square"></a>
@@ -16,7 +16,7 @@
   <a href="http://commitizen.github.io/cz-cli/"><img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg"></a>
 </p>
 
-基于[pytorch/vision](https://github.com/pytorch/vision/)实现架构，添加[albumentations-team/albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)后端进行图像增强。`albumentations`输入图像格式为`numpy ndarray`，数据类型为`uint8`，通道排列顺序为`rgb`。
+基于[pytorch/vision](https://github.com/pytorch/vision/)实现架构，添加[albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)后端进行图像增强。`albumentations`输入图像格式为`numpy ndarray`，数据类型为`uint8`，通道排列顺序为`rgb`。
 
 ## 内容列表
 
@@ -29,7 +29,7 @@
 
 ## 背景
 
-[PyTorch](https://github.com/pytorch/pytorch)提供了官方的数据增强实现：[transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms)。该模块基于`PIL`为后端进行数据增强操作，其优缺点如下：
+[PyTorch](https://github.com/pytorch/pytorch)提供了官方数据增强实现：[transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms)。该模块基于`PIL`进行数据增强操作，其优缺点如下：
 
 * 优点：
   1.  简洁清晰的数据架构
@@ -51,13 +51,13 @@ batched transformation such as for videos
 read and decode data directly as torch tensor with torchscript support (for PNG and JPEG image formats)
 ```
 
-* 一方面通过[Pillow-SIMD](https://github.com/uploadcare/pillow-simd)提高`PIL`的执行速度；
-* 另一方面通过`Tensor`操作来实现`GPU`加速
+* 一方面通过新的后端[Pillow-SIMD](https://github.com/uploadcare/pillow-simd)来提高`PIL`的执行速度；
+* 另一方面添加`PyTorch`后端来实现`GPU`加速
 
 在网上找到两个数据增强库：
 
 * [imgaug](https://github.com/aleju/imgaug)：其实现了更多的数据增强操作；
-* [albumentations-team/albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)：其在不同的后端（`pytorch/imgaug/opencv`）中找出各自最快的增强函数（参考[Benchmarking results](https://github.com/albumentations-team/albumentations#benchmarking-results)）
+* [albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)：其在不同的后端（`pytorch/imgaug/opencv`）中找出各自最快的增强函数（参考[Benchmarking results](https://github.com/albumentations-team/albumentations#benchmarking-results)）
 
 上述两个数据增强库均实现了类似于`transforms`的数据流操作方式。不过相对而言，个人还是最喜欢官方的实现和使用方式，所以新建这个代码库，基于[transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms)，在原有功能中添加`albumentation`后端实现，同时添加新的数据增强操作（*如果`albumentation`未实现，就使用`imgaug`实现*）
 
@@ -70,6 +70,7 @@ read and decode data directly as torch tensor with torchscript support (for PNG 
 * [pytorch/vision](https://github.com/pytorch/vision)
 * [albumentations-team/albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)
 * [aleju/imgaug](https://github.com/aleju/imgaug)
+* [opencv/opencv](https://github.com/opencv/opencv)
 
 ```
 @Article{info11020125,
