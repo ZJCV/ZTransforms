@@ -5,10 +5,10 @@ import sys
 
 # ---------------------- #
 # 超参数设置
-NAME = "ZTransforms"
+NAME = "ztransforms"
 AUTHOR = "zj"
 AUTHOR_EMAIL = "wy163zhuj@163.com"
-DESCRIPTION = "Implementation of torchvision-like based on imgaug"
+DESCRIPTION = "Implementation of torchvision-like based on albumentation"
 URL = "https://github.com/ZJCV/ZTransforms"
 PYTHON_REQUIRES = ">=3.8"
 INSTALL_REQUIRES = [
