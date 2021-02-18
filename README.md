@@ -1,7 +1,7 @@
 <div align="right">
   语言:
     🇨🇳
-  <a title="英语" href="./README.md">🇺🇸</a>
+  <a title="中文" href="./README.zh_CN.md">🇺🇸</a>
   <!-- <a title="俄语" href="../ru/README.md">🇷🇺</a> -->
 </div>
 
