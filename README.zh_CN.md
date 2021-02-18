@@ -16,12 +16,23 @@
   <a href="http://commitizen.github.io/cz-cli/"><img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg"></a>
 </p>
 
-基于[pytorch/vision](https://github.com/pytorch/vision/)实现架构，添加[albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)后端进行图像增强。`albumentations`输入图像格式为`numpy ndarray`，数据类型为`uint8`，通道排列顺序为`rgb`。
+基于[pytorch/vision](https://github.com/pytorch/vision/)实现架构，添加[albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)后端
+
+* 输入图像格式：`numpy ndarray`
+* 数据类型：`uint8`
+* 通道排列顺序：`rgb`
+
+关键依赖版本：
+
+* `pytorch/vision:  c1f85d34761d86db21b6b9323102390834267c9b`
+* `albumentations-team/albumentations: v0.5.2`
 
 ## 内容列表
 
 - [内容列表](#内容列表)
 - [背景](#背景)
+- [安装](#安装)
+- [使用](#使用)
 - [主要维护人员](#主要维护人员)
 - [致谢](#致谢)
 - [参与贡献方式](#参与贡献方式)
@@ -54,12 +65,28 @@ read and decode data directly as torch tensor with torchscript support (for PNG 
 * 一方面通过新的后端[Pillow-SIMD](https://github.com/uploadcare/pillow-simd)来提高`PIL`的执行速度；
 * 另一方面添加`PyTorch`后端来实现`GPU`加速
 
-在网上找到两个数据增强库：
+在网上找到两个数据增强库，除了分类数据增强外还提供了检测/分割数据增强：
 
 * [imgaug](https://github.com/aleju/imgaug)：其实现了更多的数据增强操作；
 * [albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)：其在不同的后端（`pytorch/imgaug/opencv`）中找出各自最快的增强函数（参考[Benchmarking results](https://github.com/albumentations-team/albumentations#benchmarking-results)）
 
 上述两个数据增强库均实现了类似于`transforms`的数据流操作方式。不过相对而言，个人还是最喜欢官方的实现和使用方式，所以新建这个代码库，基于[transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms)，在原有功能中添加`albumentation`后端实现，同时添加新的数据增强操作（*如果`albumentation`未实现，就使用`imgaug`实现*）
+
+
+## 安装
+
+```
+$ pip install ztransforms
+```
+
+## 使用
+
+```
+# import torchvision.transforms as transforms
+import ztransforms.cls as transforms
+...
+...
+```
 
 ## 主要维护人员
 
