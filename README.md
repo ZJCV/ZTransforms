@@ -1,14 +1,14 @@
 <div align="right">
   语言:
-    🇨🇳
-  <a title="中文" href="./README.zh_CN.md">🇺🇸</a>
+    🇺🇸
+  <a title="中文" href="README.zh-CN.md">🇨🇳</a>
   <!-- <a title="俄语" href="../ru/README.md">🇷🇺</a> -->
 </div>
 
  <div align="center"><a title="" href="https://github.com/ZJCV/ZTransforms.git"><img align="center" src="./imgs/ZTransforms.png"></a></div>
 
 <p align="center">
-  «ZTransforms»是一个图像数据增强代码库
+  «ZTransforms» is an image data enhancement code base
 <br>
 <br>
   <a href="https://github.com/RichardLitt/standard-readme"><img src="https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square"></a>
@@ -16,42 +16,42 @@
   <a href="http://commitizen.github.io/cz-cli/"><img src="https://img.shields.io/badge/commitizen-friendly-brightgreen.svg"></a>
 </p>
 
-基于[pytorch/vision](https://github.com/pytorch/vision/)实现架构，添加[albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)后端
+based on [pytorch/vision](https://github.com/pytorch/vision/) architecture，add [albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340) as the backend
 
-* 输入图像格式：`numpy ndarray`
-* 数据类型：`uint8`
-* 通道排列顺序：`rgb`
+* input image format：`numpy ndarray`
+* data type：`uint8`
+* channel arrangement order：`rgb`
 
-关键依赖版本：
+critical dependencies's version:
 
 * `pytorch/vision:  c1f85d34761d86db21b6b9323102390834267c9b`
 * `albumentations-team/albumentations: v0.5.2`
 
-## 内容列表
+## Table of Contents
 
-- [内容列表](#内容列表)
-- [背景](#背景)
-- [安装](#安装)
-- [使用](#使用)
-- [主要维护人员](#主要维护人员)
-- [致谢](#致谢)
-- [参与贡献方式](#参与贡献方式)
-- [许可证](#许可证)
+- [Table of Contents](#table-of-contents)
+- [Background](#background)
+- [Install](#install)
+- [Usage](#usage)
+- [Maintainers](#maintainers)
+- [Thanks](#thanks)
+- [Contributing](#contributing)
+- [License](#license)
 
-## 背景
+## Background
 
-[PyTorch](https://github.com/pytorch/pytorch)提供了官方数据增强实现：[transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms)。该模块基于`PIL`进行数据增强操作，其优缺点如下：
+[PyTorch](https://github.com/pytorch/pytorch) provides an official data enhancement implementation：[transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms)。The module performs data enhancement operation based on PIL, and its advantages and disadvantages are as follows:
 
-* 优点：
-  1.  简洁清晰的数据架构
-  2.  简单易懂的数据处理流
-  3. 完善的文档介绍
-* 缺点：
-  1.  基于`PIL`后端，提供的图像增强功能有限
-  2.  基于`PIL`后端，相较于其他库的执行速度慢
+* Advantages:
+  1.  Simple and clear data architecture
+  2.  Simple and understandable data processing flow
+  3. Perfect documentation introduction
+* Disadvantages:
+  1.  Based on the PIL backend, the provided image enhancement function is limited
+  2.  Compared with other implementations, the execution speed is not fast
  
-针对于执行速度问题，`torchvision`也意识到了这一点，从`0.8.0`开始进行了改进
-  
+`torchvision` is also aware of this and has made improvements since "0.8.0"
+
 ```
 Prior to v0.8.0, transforms in torchvision have traditionally been PIL-centric and presented multiple limitations due to that. Now, since v0.8.0, transforms implementations are Tensor and PIL compatible and we can achieve the following new features:
 
@@ -62,24 +62,23 @@ batched transformation such as for videos
 read and decode data directly as torch tensor with torchscript support (for PNG and JPEG image formats)
 ```
 
-* 一方面通过新的后端[Pillow-SIMD](https://github.com/uploadcare/pillow-simd)来提高`PIL`的执行速度；
-* 另一方面添加`PyTorch`后端来实现`GPU`加速
+* On the one hand, the new backend [Pill-SIMD](https://github.com/uploadcare/Pill-SIMD) is used to improve the execution speed of PIL;
+* On the other hand, PyTorch backend is added to realize GPU acceleration
 
-在网上找到两个数据增强库，除了分类数据增强外还提供了检测/分割数据增强：
+Two data enhancement libraries are found on the Internet, which provide detection/segmentation data enhancement in addition to classification data enhancement:
 
-* [imgaug](https://github.com/aleju/imgaug)：其实现了更多的数据增强操作；
-* [albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)：其在不同的后端（`pytorch/imgaug/opencv`）中找出各自最快的增强函数（参考[Benchmarking results](https://github.com/albumentations-team/albumentations#benchmarking-results)）
+* [imgaug](https://github.com/aleju/imgaug)：Which realizes more data enhancement operations；
+* [albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)：It finds out the fastest enhancement function in different backend (`pytorch/imgaug/opencv`) (refer to [benchmarking results](https://github.com/Albumentations-team/Albumentations#benchmarking-results))
 
-上述两个数据增强库均实现了类似于`transforms`的数据流操作方式。不过相对而言，个人还是最喜欢官方的实现和使用方式，所以新建这个代码库，基于[transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms)，在原有功能中添加`albumentation`后端实现，同时添加新的数据增强操作（*如果`albumentation`未实现，就使用`imgaug`实现*）
+The above two data enhancement libraries have realized the data flow operation mode similar to `transforms`。However, relatively speaking, I still like the official implementation and usage. Therefore, this code base is newly built, based on [transforms](https://github.com/pytorch/vision/tree/master/torchvision/transforms), the `albumentation` backend implementation is added to the original functions, and new data enhancement operations are also added (if `albumentation` is not implemented, use `imgaug/opencv/...` to implement it).
 
-
-## 安装
+## Install
 
 ```
 $ pip install ztransforms
 ```
 
-## 使用
+## Usage
 
 ```
 # import torchvision.transforms as transforms
@@ -88,11 +87,11 @@ import ztransforms.cls as transforms
 ...
 ```
 
-## 主要维护人员
+## Maintainers
 
 * zhujian - *Initial work* - [zjykzj](https://github.com/zjykzj)
 
-## 致谢
+## Thanks
 
 * [pytorch/vision](https://github.com/pytorch/vision)
 * [albumentations-team/albumentations](https://github.com/albumentations-team/albumentations/tree/f2462be3a4d01c872474d0e7fc0f32f387b06340)
@@ -144,16 +143,16 @@ import ztransforms.cls as transforms
 }
 ```
 
-## 参与贡献方式
+## Contributing
 
-欢迎任何人的参与！打开[issue](https://github.com/zjykzj/ZTransforms/issues)或提交合并请求。
+Anyone's participation is welcome! Open an [issue](https://github.com/ZJCV/ZTransforms/issues) or submit PRs.
 
-注意:
+Small note:
 
-* `GIT`提交，请遵守[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4/)规范
-* 语义版本化，请遵守[Semantic Versioning 2.0.0](https://semver.org)规范
-* `README`编写，请遵守[standard-readme](https://github.com/RichardLitt/standard-readme)规范
+* Git submission specifications should be complied with [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4/)
+* If versioned, please conform to the [Semantic Versioning 2.0.0](https://semver.org) specification
+* If editing the README, please conform to the[standard-readme](https://github.com/RichardLitt/standard-readme) specification.
 
-## 许可证
+## License
 
 [Apache License 2.0](LICENSE) © 2021 zjykzj
