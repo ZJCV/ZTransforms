@@ -1,4 +1,4 @@
 
 # resize
 
-测试文件：`samples/resize.py`
+* 功能描述：图像缩放

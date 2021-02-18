@@ -38,7 +38,7 @@ def _get_image_size(img: Any) -> List[int]:
 
 @torch.jit.unused
 def resize(img, size, interpolation=cv2.INTER_LINEAR):
-    if not _is_numpy_image(img):
+    if not _is_numpy(img):
         raise TypeError('img should be Numpy Image. Got {}'.format(type(img)))
     if not (isinstance(size, int) or (isinstance(size, Sequence) and len(size) in (1, 2))):
         raise TypeError('Got inappropriate size arg: {}'.format(size))
