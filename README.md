@@ -1,5 +1,5 @@
 <div align="right">
-  语言:
+  Language:
     🇺🇸
   <a title="中文" href="README.zh-CN.md">🇨🇳</a>
   <!-- <a title="俄语" href="../ru/README.md">🇷🇺</a> -->
