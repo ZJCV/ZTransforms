@@ -1,8 +1,7 @@
 <div align="right">
   Language:
     🇺🇸
-  <a title="中文" href="README.zh-CN.md">🇨🇳</a>
-  <!-- <a title="俄语" href="../ru/README.md">🇷🇺</a> -->
+  <a title="Chinese" href="README.zh-CN.md">🇨🇳</a>
 </div>
 
  <div align="center"><a title="" href="https://github.com/ZJCV/ZTransforms.git"><img align="center" src="./imgs/ZTransforms.png"></a></div>
